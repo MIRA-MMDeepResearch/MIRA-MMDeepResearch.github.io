@@ -131,3 +131,73 @@ figure:hover img { transform: scale(1.015); box-shadow: 0 6px 22px rgba(0, 0, 0,
   figure:hover img, .btn:hover { transform: none; }
 }
 .authors .row-break { flex-basis: 100%; height: 0; }
+
+/* report examples: tabs + page carousel */
+.reports { margin-top: 8px; }
+.report-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 14px; }
+.report-tabs [role="tab"] {
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  padding: 7px 16px; border-radius: 999px;
+  border: 1px solid #da291c; background: transparent; color: #da291c;
+  transition: background-color .15s ease, color .15s ease;
+}
+.report-tabs [role="tab"][aria-selected="true"] { background: #da291c; color: #fff; }
+.report-tabs [role="tab"]:hover { background: rgba(218, 41, 28, 0.08); }
+.report-tabs [role="tab"][aria-selected="true"]:hover { background: #b8221a; }
+:root[data-theme="dark"] .report-tabs [role="tab"]:not([aria-selected="true"]) { color: #f08a80; border-color: #f08a80; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .report-tabs [role="tab"]:not([aria-selected="true"]) { color: #f08a80; border-color: #f08a80; }
+}
+
+.report-viewer { position: relative; outline: none; border-radius: 10px; }
+.report-viewer:focus-visible { box-shadow: 0 0 0 2px #da291c; }
+.report-viewer .viewport {
+  overflow: hidden; height: min(74vh, 900px); border-radius: 10px;
+  background: var(--row-alt); border: 1px solid var(--line);
+}
+.report-viewer .track { display: flex; height: 100%; transition: transform .45s ease; }
+.report-viewer .slide {
+  flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  padding: 14px; box-sizing: border-box;
+}
+.report-viewer .slide a { display: flex; height: 100%; max-width: 100%; align-items: center; justify-content: center; cursor: zoom-in; }
+.report-viewer .slide img {
+  max-height: 100%; max-width: 100%; width: auto; height: auto; object-fit: contain;
+  background: #fff; border-radius: 4px; box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12); margin: 0;
+}
+.report-viewer .nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+  background: #da291c; color: #fff; font-size: 28px; line-height: 40px; padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); transition: background-color .15s ease, opacity .15s ease;
+}
+.report-viewer .nav:hover { background: #b8221a; }
+.report-viewer .nav:disabled { opacity: 0.3; cursor: default; background: #da291c; }
+.report-viewer .prev { left: 10px; }
+.report-viewer .next { right: 10px; }
+
+.report-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; margin-top: 12px; }
+.report-meta .counter { font-weight: 700; color: #da291c; font-variant-numeric: tabular-nums; min-width: 3.5em; text-align: center; }
+.report-meta .dots { display: flex; gap: 6px; }
+.report-meta .dot {
+  width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0; cursor: pointer;
+  background: var(--line); transition: background-color .15s ease, transform .15s ease;
+}
+.report-meta .dot[aria-current="true"] { background: #da291c; transform: scale(1.25); }
+.report-meta .hint { color: var(--muted); font-size: 0.82rem; }
+
+@media (max-width: 640px) {
+  .report-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .report-tabs [role="tab"] { padding: 7px 8px; font-size: 0.8rem; }
+  .report-viewer .viewport { height: min(70vh, calc((100vw - 32px) * 1.36)); }
+  .report-viewer .nav { opacity: 0.85; }
+  .report-viewer .nav:disabled { opacity: 0.25; }
+  .report-viewer .slide { padding: 8px; }
+  .report-viewer .nav { width: 36px; height: 36px; font-size: 24px; line-height: 32px; }
+  .report-viewer .prev { left: 4px; }
+  .report-viewer .next { right: 4px; }
+  .report-meta .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .report-viewer .track, .report-meta .dot, .report-tabs [role="tab"] { transition: none; }
+}

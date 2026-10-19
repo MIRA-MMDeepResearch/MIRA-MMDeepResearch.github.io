@@ -8,8 +8,9 @@
 <meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/joyagent_mira_logo_512.png">
 <link rel="apple-touch-icon" href="assets/joyagent_mira_logo_512.png">
-<link rel="stylesheet" href="assets/css/style.css?v=20261019b">
-<script src="assets/js/main.js?v=20261019b" defer></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261019e">
+<script src="assets/reports/manifest.js?v=20261019c" defer></script>
+<script src="assets/js/main.js?v=20261019d" defer></script>
 </head>
 <body>
 
@@ -148,18 +149,29 @@
 
   <section class="wrap" aria-labelledby="cases">
     <h2 id="cases">Report Examples</h2>
-    <p class="lead">One traffic-flow request in both report modes, one selected page each.</p>
-    <div class="cases">
-      <figure class="page">
-        <img src="assets/images/case_concise.png" width="1100" height="1800" loading="lazy"
-             alt="Page 1 of the two-page Concise report on the evolution of traffic flow visualization in civil engineering education, with a time-space diagram and a flow-density curve.">
-        <figcaption>Concise report, page 1 of 2.</figcaption>
-      </figure>
-      <figure class="page">
-        <img src="assets/images/case_detail.png" width="1100" height="1800" loading="lazy"
-             alt="Page 7 of the nine-page Detail report for the same request, with expanded discussion and accompanying visuals.">
-        <figcaption>Detail report, page 7 of 9.</figcaption>
-      </figure>
+    <p class="lead">Two requests, each delivered in both modes. Reports are shown in full, with the paper's
+      annotations, numbered images, and image sources.</p>
+    <div class="reports" id="reports">
+      <div class="report-tabs" role="tablist" aria-label="Report">
+        <button type="button" role="tab" id="tab-concrete_concise" aria-controls="report-viewer" aria-selected="true" data-report="concrete_concise">Roman Concrete &middot; Concise</button>
+        <button type="button" role="tab" id="tab-concrete_detail" aria-controls="report-viewer" aria-selected="false" tabindex="-1" data-report="concrete_detail">Roman Concrete &middot; Detail</button>
+        <button type="button" role="tab" id="tab-cam_concise" aria-controls="report-viewer" aria-selected="false" tabindex="-1" data-report="cam_concise">CAM Plants &middot; Concise</button>
+        <button type="button" role="tab" id="tab-cam_detail" aria-controls="report-viewer" aria-selected="false" tabindex="-1" data-report="cam_detail">CAM Plants &middot; Detail</button>
+      </div>
+      <div class="report-viewer" id="report-viewer" role="tabpanel" aria-labelledby="tab-concrete_concise"
+           aria-roledescription="carousel" tabindex="0">
+        <button type="button" class="nav prev" aria-label="Previous page">&#8249;</button>
+        <div class="viewport"><div class="track"></div></div>
+        <button type="button" class="nav next" aria-label="Next page">&#8250;</button>
+      </div>
+      <div class="report-meta">
+        <span class="counter" aria-live="polite"></span>
+        <div class="dots" role="group" aria-label="Pages"></div>
+        <span class="hint">Swipe or use &larr; &rarr;; click a page to open it full size.</span>
+      </div>
+      <noscript>
+        <p class="lead"><a href="assets/reports/concrete_concise/01.webp">Open the first report page</a></p>
+      </noscript>
     </div>
   </section>
 
