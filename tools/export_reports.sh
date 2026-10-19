@@ -5,7 +5,8 @@
 #
 #   bash tools/export_reports.sh [path/to/paper]
 #
-# Needs: tectonic, pdfcrop (TeX Live, uses ghostscript), pdftocairo (poppler), cwebp. Reads the paper source; never writes to it.
+# Needs: pdflatex/latexmk (TeX Live; the paper is built with pdfLaTeX, which selects the
+# class's TFM font branch), pdfcrop (TeX Live, uses ghostscript), pdftocairo (poppler), cwebp. Reads the paper source; never writes to it.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PAPER="${1:-$HOME/Papers/MIRA/Joy Kit/paper}"
@@ -29,7 +30,10 @@ for topic, text in sources.items():
     for m in re.finditer(r"\\begin\{reportcard\}\{(\w+)\}.*?\\end\{reportcard\}", text, re.S):
         mode = m.group(1).lower()
         doc = (preamble + "\\begin{document}\n\\pagestyle{empty}\n"
-               "\\input{sections/showcase/style}\n" + m.group(0) + "\n\\end{document}\n")
+               "\\input{sections/showcase/style}\n"
+               # Ragged columns: keep spare space at a column foot instead of stretching it
+               # between paragraphs (the report starts on a fresh page here, not mid-page).
+               "\\raggedcolumns\n" + m.group(0) + "\n\\end{document}\n")
         pathlib.Path(f"report_{topic}_{mode}.tex").write_text(doc)
         print("wrote", f"report_{topic}_{mode}.tex")
 EOF
@@ -38,8 +42,9 @@ cd - >/dev/null
 rm -rf "$OUT" && mkdir -p "$OUT"
 for tex in "$WORK"/paper/report_*.tex; do
   name="$(basename "$tex" .tex)"; name="${name#report_}"
-  (cd "$WORK/paper" && tectonic --outdir "$WORK" "$(basename "$tex")" >/dev/null 2>&1) \
-    || { echo "tectonic failed for $name" >&2; exit 1; }
+  (cd "$WORK/paper" && latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir="$WORK" \
+      "$(basename "$tex")" >/dev/null 2>&1) \
+    || { echo "pdflatex failed for $name (log: $WORK/report_${name}.log)" >&2; tail -30 "$WORK/report_${name}.log" >&2; exit 1; }
   # Trim each page to its content (drops the page margins and the empty end of a last page).
   pdfcrop --margins 18 "$WORK/report_${name}.pdf" "$WORK/crop_${name}.pdf" >/dev/null
   pdf="$WORK/crop_${name}.pdf"
@@ -54,7 +59,7 @@ done
 
 # Page list for the carousel. A .js file (not JSON) so it also loads from file://.
 python3 - "$OUT" <<'PY'
-import json, pathlib, subprocess, sys
+import hashlib, json, pathlib, subprocess, sys
 out = pathlib.Path(sys.argv[1])
 def size(f):
     r = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(f)], capture_output=True, text=True).stdout
@@ -62,7 +67,9 @@ def size(f):
     return vals[0], vals[1]
 data = {}
 for d in sorted(p for p in out.iterdir() if p.is_dir()):
-    data[d.name] = [{"src": f"{out}/{d.name}/{f.name}", "w": size(f)[0], "h": size(f)[1]}
+    # ?v=<content hash> so browsers refetch a page image whenever its content changes.
+    data[d.name] = [{"src": f"{out}/{d.name}/{f.name}?v={hashlib.md5(f.read_bytes()).hexdigest()[:8]}",
+                     "w": size(f)[0], "h": size(f)[1]}
                     for f in sorted(d.glob("*.webp"))]
 (out / "manifest.js").write_text("window.MIRA_REPORTS = " + json.dumps(data, indent=1) + ";\n")
 print("manifest:", {k: len(v) for k, v in data.items()})
