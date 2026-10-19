@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,7 @@
 <link rel="icon" type="image/png" sizes="512x512" href="assets/joyagent_mira_logo_512.png">
 <link rel="apple-touch-icon" href="assets/joyagent_mira_logo_512.png">
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/main.js" defer></script>
 </head>
 <body>
 
@@ -57,42 +58,28 @@
     <figure>
       <img src="assets/images/results_chart.png" width="2400" height="722"
            alt="Bar chart of scores on eight benchmarks. MIRA-SFT scores 80.7 on MMSearch, 38.9 on MMSearch-Plus, 58.4 on BrowseComp-VL, 79.0 on SimpleVQA, 82.0 on LiveVQA, 79.3 on FVQA, 29.8 on VDR-Bench and 42.6 on MMDeepResearch, compared with Qwen3.6-35B-A3B, WeAgent-MMSearch, OpenSearch-VL, DeepSeek-V4.1-Flash and Kimi-K3.">
-      <figcaption id="teaser-caption"><b>Benchmark performance of MIRA.</b> MIRA-SFT versus open agents and frontier models.</figcaption>
+      <figcaption id="teaser-caption">MIRA-SFT versus open agents and frontier models on eight benchmarks.</figcaption>
     </figure>
   </section>
 
   <section class="wrap" aria-labelledby="abstract">
-    <h2 id="abstract">Abstract</h2>
+    <h2 id="abstract">Overview</h2>
     <p class="abstract">
-      Deep research agents are increasingly capable of searching the open web and synthesizing evidence, yet they
-      remain poorly suited to <b>controllable report generation in multimodal deep research</b>. This task requires
-      agents to handle interleaved textual and visual inputs, gather multimodal evidence through multi-step web
-      search, and deliver comprehensive illustrated reports under user-specified requirements. Existing systems
-      face two limitations. During reasoning, they often underuse images discovered along the search trajectory;
-      during generation, they tend to produce fixed-form answers with limited control over report granularity,
-      multimodal composition, and evidence grounding. We introduce <b>MIRA</b>, a <b>M</b>ultimodal
-      <b>I</b>llustrated Deep <b>R</b>esearch <b>A</b>gent for controllable reports. MIRA integrates textual and
-      visual evidence throughout research and writing. At its core, MIRA-Harness translates user requirements into
-      generation contracts and connects four stages: evidence collection, report submission, feedback-driven
-      revision, and final delivery. Building on this harness, MIRA-Data constructs high-quality multi-hop
-      multimodal research trajectories, and we post-train foundation models to operate within the workflow. Using
-      Qwen3.6-35B-A3B, MIRA achieves <b>state-of-the-art performance</b> among open agents on 7 representative,
-      established multimodal-search and deep-research-agent benchmarks, while producing user-aligned illustrated
-      reports with traceable textual and visual evidence.
+      Deep research agents can search the open web, but they remain poorly suited to delivering what users
+      often need: an illustrated report with the requested depth, images, and traceable sources.
+      <b>MIRA</b> turns these requirements into generation contracts. <b>MIRA-Harness</b> gathers textual and
+      visual evidence, checks each submitted draft against the contract, and revises until it is satisfied;
+      <b>MIRA-Data</b> turns this workflow into training trajectories. Built on Qwen3.6-35B-A3B, MIRA-SFT is the
+      strongest of the compared open agents on seven of eight benchmarks.
     </p>
   </section>
 
   <section class="wrap" aria-labelledby="highlights">
     <h2 id="highlights">Highlights</h2>
     <ul class="highlights">
-      <li><b>Controllable report generation.</b> MIRA produces illustrated, evidence-grounded reports under
-        user-specified requirements for report granularity, multimodal composition, and evidence grounding.</li>
-      <li><b>MIRA-Harness and MIRA-Data.</b> Generation contracts unify user requirements, multimodal evidence
-        collection, illustrated writing, and feedback-driven revision; MIRA-Data builds training trajectories
-        aligned with this workflow.</li>
-      <li><b>Strong open agent.</b> Trained on Qwen3.6-35B-A3B, MIRA-SFT achieves state-of-the-art performance
-        among the compared open agents on seven of eight multimodal search, knowledge-intensive VQA, and
-        illustrated deep-research benchmarks.</li>
+      <li><b>Controllable reports.</b> Users set report depth, visual composition, and evidence grounding.</li>
+      <li><b>Harness + data.</b> Contracts drive research, writing, and revision; the same workflow produces training trajectories.</li>
+      <li><b>Strong open agent.</b> Best among compared open agents on 7 of 8 benchmarks.</li>
     </ul>
   </section>
 
@@ -101,8 +88,7 @@
     <figure>
       <img src="assets/images/task_overview.png" width="2400" height="1363" loading="lazy"
            alt="One multimodal request about CAM photosynthesis answered three ways: a traditional short answer, a MIRA Concise report and a MIRA Detail report with more images and sources.">
-      <figcaption><b>From search answers to controllable illustrated reports.</b> For one request, MIRA controls
-        report granularity, visual composition, and evidence grounding across Concise and Detail deliverables.</figcaption>
+      <figcaption>One request, two controllable deliverables: Concise and Detail reports.</figcaption>
     </figure>
   </section>
 
@@ -111,9 +97,7 @@
     <figure>
       <img src="assets/images/harness_overview.png" width="2400" height="939" loading="lazy"
            alt="MIRA-Harness pipeline: a query and report mode become a generation contract, which guides multimodal research, evidence tracking, report submission and feedback-driven revision before delivery.">
-      <figcaption><b>MIRA-Harness for user-specified illustrated reports.</b> A mode-conditioned generation contract
-        guides multimodal research, evidence tracking, report submission, and feedback-driven revision, and delivers
-        the report once the contract conditions are satisfied.</figcaption>
+      <figcaption>A generation contract drives research, evidence tracking, submission, and revision.</figcaption>
     </figure>
   </section>
 
@@ -122,10 +106,7 @@
     <figure>
       <img src="assets/images/data_synthesis.png" width="2400" height="1013" loading="lazy"
            alt="Trajectory synthesis: a query generator builds report requests and rubrics, a teacher model runs inside MIRA-Harness, and a synthesis gate checks rubric coverage and trajectory integrity before trajectories join MIRA-Data.">
-      <figcaption><b>Trajectory synthesis for illustrated reports.</b> A query generator constructs report-oriented
-        requests and internal rubrics. Kimi K2.6 generates trajectories within MIRA-Harness, and the synthesis gate
-        verifies rubric coverage and trajectory integrity. Accepted trajectories, mixed with general search
-        trajectories, form MIRA-Data.</figcaption>
+      <figcaption>Trajectories synthesized inside MIRA-Harness, verified by a gate, then mixed with general search data.</figcaption>
     </figure>
   </section>
 
@@ -161,24 +142,22 @@
         </tbody>
       </table>
     </div>
-    <p class="caption">Main results across eight multimodal search, knowledge-intensive VQA, and illustrated
-      deep-research benchmarks. Bold marks the best result outside the large-scale frontier models; &ldquo;&ndash;&rdquo; means not reported.</p>
+    <p class="caption">Bold: best outside the large-scale frontier models. &ldquo;&ndash;&rdquo;: not reported.</p>
   </section>
 
   <section class="wrap" aria-labelledby="cases">
     <h2 id="cases">Report Examples</h2>
-    <p class="lead">One traffic-flow research request, delivered in both report modes. Each image shows one selected
-      page; neither shows the full report.</p>
+    <p class="lead">One traffic-flow request in both report modes, one selected page each.</p>
     <div class="cases">
       <figure class="page">
         <img src="assets/images/case_concise.png" width="1100" height="1800" loading="lazy"
              alt="Page 1 of the two-page Concise report on the evolution of traffic flow visualization in civil engineering education, with a time-space diagram and a flow-density curve.">
-        <figcaption><b>Concise report.</b> Page 1 of 2: text and diagrams in the concise format.</figcaption>
+        <figcaption>Concise report, page 1 of 2.</figcaption>
       </figure>
       <figure class="page">
         <img src="assets/images/case_detail.png" width="1100" height="1800" loading="lazy"
              alt="Page 7 of the nine-page Detail report for the same request, with expanded discussion and accompanying visuals.">
-        <figcaption><b>Detail report.</b> Page 7 of 9: expanded discussion and accompanying visuals.</figcaption>
+        <figcaption>Detail report, page 7 of 9.</figcaption>
       </figure>
     </div>
   </section>

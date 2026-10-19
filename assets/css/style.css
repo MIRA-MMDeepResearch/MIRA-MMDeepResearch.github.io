@@ -117,3 +117,16 @@ tr.group td { position: static; }
 .highlights li { margin: 0 0 10px; }
 .btn[aria-disabled="true"] { cursor: default; }
 .btn[aria-disabled="true"]:hover { background: var(--btn-bg); }
+
+/* light motion: fade-in on scroll, gentle hover zoom on figures */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+figure img { transition: transform .35s ease, box-shadow .35s ease; }
+figure:hover img { transform: scale(1.015); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12); }
+.btn { transition: background-color .15s ease, transform .15s ease; }
+.btn:not([aria-disabled="true"]):hover { transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  figure img, .btn { transition: none; }
+  figure:hover img, .btn:hover { transform: none; }
+}
