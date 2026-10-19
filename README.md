@@ -3,6 +3,6 @@
 Source of https://joyagent-mira.github.io/, the project page for
 *MIRA: A Multimodal Illustrated Deep Research Agent for Controllable Reports*.
 
-Code: https://github.com/JoyAgent-MIRA/MIRA
+Code (coming soon): https://github.com/JoyAgent-MIRA
 
-Models and data: https://huggingface.co/JoyAgent-MIRA
+Weights and data (coming soon): https://huggingface.co/JoyAgent-MIRA

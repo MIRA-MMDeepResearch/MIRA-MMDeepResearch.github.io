@@ -43,12 +43,13 @@
     <p class="notes"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&dagger;</sup>Corresponding author &nbsp;&middot;&nbsp; Hongrui Wu did this work during an internship at JD.com.</p>
 
     <nav class="links" aria-label="Resources">
-      <a class="btn" href="#">Paper</a>
-      <a class="btn" href="#">arXiv</a>
-      <a class="btn" href="https://github.com/JoyAgent-MIRA/MIRA">Code</a>
+      <span class="btn soon" aria-disabled="true">Paper <small>coming soon</small></span>
+      <span class="btn soon" aria-disabled="true">arXiv <small>coming soon</small></span>
+      <a class="btn" href="https://github.com/JoyAgent-MIRA">Code <small>coming soon</small></a>
       <a class="btn" href="https://huggingface.co/JoyAgent-MIRA">Model</a>
       <a class="btn" href="https://huggingface.co/JoyAgent-MIRA">Data</a>
     </nav>
+    <p class="release-note">Weights and data coming soon on <a href="https://huggingface.co/JoyAgent-MIRA">Hugging Face</a>; code coming soon on <a href="https://github.com/JoyAgent-MIRA">GitHub</a>.</p>
   </div>
 </header>
 
@@ -80,6 +81,20 @@
       established multimodal-search and deep-research-agent benchmarks, while producing user-aligned illustrated
       reports with traceable textual and visual evidence.
     </p>
+  </section>
+
+  <section class="wrap" aria-labelledby="highlights">
+    <h2 id="highlights">Highlights</h2>
+    <ul class="highlights">
+      <li><b>Controllable report generation.</b> MIRA produces illustrated, evidence-grounded reports under
+        user-specified requirements for report granularity, multimodal composition, and evidence grounding.</li>
+      <li><b>MIRA-Harness and MIRA-Data.</b> Generation contracts unify user requirements, multimodal evidence
+        collection, illustrated writing, and feedback-driven revision; MIRA-Data builds training trajectories
+        aligned with this workflow.</li>
+      <li><b>Strong open agent.</b> Trained on Qwen3.6-35B-A3B, MIRA-SFT achieves state-of-the-art performance
+        among the compared open agents on seven of eight multimodal search, knowledge-intensive VQA, and
+        illustrated deep-research benchmarks.</li>
+    </ul>
   </section>
 
   <section class="wrap" aria-labelledby="task">
