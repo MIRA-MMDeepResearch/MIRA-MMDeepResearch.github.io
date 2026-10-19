@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIRA: A Multimodal Illustrated Deep Research Agent for Controllable Reports</title>
+<meta name="description" content="MIRA is a multimodal deep research agent that writes controllable, illustrated reports with traceable textual and visual evidence.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/joyagent_mira_logo_512.png">
+<link rel="apple-touch-icon" href="assets/joyagent_mira_logo_512.png">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <picture class="logo">
+      <source srcset="assets/joyagent_mira_logo.svg" type="image/svg+xml">
+      <img src="assets/joyagent_mira_logo_512.png" width="96" height="96" alt="JoyAgent-MIRA logo: a dog holding a magnifying glass over linked image and text cards">
+    </picture>
+    <h1 class="title"><span class="brand">MIRA</span>: A Multimodal Illustrated Deep Research Agent for Controllable Reports</h1>
+
+    <p class="authors">
+      <span>Hongrui Wu<sup>1,3,*</sup></span>
+      <span>Kaiwen Tuo<sup>2,*</sup></span>
+      <span>Congcong Wang<sup>3,*</sup></span>
+      <span>Gen Li<sup>3</sup></span>
+      <span>Shuai Dong<sup>4</sup></span>
+      <span>Xinlei Yu<sup>5</sup></span>
+      <span>Yuqi Xu<sup>3</sup></span>
+      <span>Haowen Hou<sup>6</sup></span>
+      <span>Zelin Peng<sup>3</sup></span>
+      <span>Jiaqi Wang<sup>3,&dagger;</sup></span>
+    </p>
+    <p class="affils">
+      <span><sup>1</sup>Stanford University</span>
+      <span><sup>2</sup>The Hong Kong University of Science and Technology</span>
+      <span><sup>3</sup>JD.com</span>
+      <span><sup>4</sup>Fudan University</span>
+      <span><sup>5</sup>The Chinese University of Hong Kong</span>
+      <span><sup>6</sup>Shanghai Jiao Tong University</span>
+    </p>
+    <p class="notes"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&dagger;</sup>Corresponding author &nbsp;&middot;&nbsp; Hongrui Wu did this work during an internship at JD.com.</p>
+
+    <nav class="links" aria-label="Resources">
+      <a class="btn" href="#">Paper</a>
+      <a class="btn" href="#">arXiv</a>
+      <a class="btn" href="https://github.com/JoyAgent-MIRA/MIRA">Code</a>
+      <a class="btn" href="https://huggingface.co/JoyAgent-MIRA">Model</a>
+      <a class="btn" href="https://huggingface.co/JoyAgent-MIRA">Data</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap teaser" aria-labelledby="teaser-caption">
+    <figure>
+      <img src="assets/images/results_chart.png" width="2400" height="722"
+           alt="Bar chart of scores on eight benchmarks. MIRA-SFT scores 80.7 on MMSearch, 38.9 on MMSearch-Plus, 58.4 on BrowseComp-VL, 79.0 on SimpleVQA, 82.0 on LiveVQA, 79.3 on FVQA, 29.8 on VDR-Bench and 42.6 on MMDeepResearch, compared with Qwen3.6-35B-A3B, WeAgent-MMSearch, OpenSearch-VL, DeepSeek-V4.1-Flash and Kimi-K3.">
+      <figcaption id="teaser-caption"><b>Benchmark performance of MIRA.</b> MIRA-SFT versus open agents and frontier models.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap" aria-labelledby="abstract">
+    <h2 id="abstract">Abstract</h2>
+    <p class="abstract">
+      Deep research agents are increasingly capable of searching the open web and synthesizing evidence, yet they
+      remain poorly suited to <b>controllable report generation in multimodal deep research</b>. This task requires
+      agents to handle interleaved textual and visual inputs, gather multimodal evidence through multi-step web
+      search, and deliver comprehensive illustrated reports under user-specified requirements. Existing systems
+      face two limitations. During reasoning, they often underuse images discovered along the search trajectory;
+      during generation, they tend to produce fixed-form answers with limited control over report granularity,
+      multimodal composition, and evidence grounding. We introduce <b>MIRA</b>, a <b>M</b>ultimodal
+      <b>I</b>llustrated Deep <b>R</b>esearch <b>A</b>gent for controllable reports. MIRA integrates textual and
+      visual evidence throughout research and writing. At its core, MIRA-Harness translates user requirements into
+      generation contracts and connects four stages: evidence collection, report submission, feedback-driven
+      revision, and final delivery. Building on this harness, MIRA-Data constructs high-quality multi-hop
+      multimodal research trajectories, and we post-train foundation models to operate within the workflow. Using
+      Qwen3.6-35B-A3B, MIRA achieves <b>state-of-the-art performance</b> among open agents on 7 representative,
+      established multimodal-search and deep-research-agent benchmarks, while producing user-aligned illustrated
+      reports with traceable textual and visual evidence.
+    </p>
+  </section>
+
+  <section class="wrap" aria-labelledby="task">
+    <h2 id="task">From Search Answers to Illustrated Reports</h2>
+    <figure>
+      <img src="assets/images/task_overview.png" width="2400" height="1363" loading="lazy"
+           alt="One multimodal request about CAM photosynthesis answered three ways: a traditional short answer, a MIRA Concise report and a MIRA Detail report with more images and sources.">
+      <figcaption><b>From search answers to controllable illustrated reports.</b> For one request, MIRA controls
+        report granularity, visual composition, and evidence grounding across Concise and Detail deliverables.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap" aria-labelledby="method">
+    <h2 id="method">MIRA-Harness</h2>
+    <figure>
+      <img src="assets/images/harness_overview.png" width="2400" height="939" loading="lazy"
+           alt="MIRA-Harness pipeline: a query and report mode become a generation contract, which guides multimodal research, evidence tracking, report submission and feedback-driven revision before delivery.">
+      <figcaption><b>MIRA-Harness for user-specified illustrated reports.</b> A mode-conditioned generation contract
+        guides multimodal research, evidence tracking, report submission, and feedback-driven revision, and delivers
+        the report once the contract conditions are satisfied.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap" aria-labelledby="data">
+    <h2 id="data">MIRA-Data</h2>
+    <figure>
+      <img src="assets/images/data_synthesis.png" width="2400" height="1013" loading="lazy"
+           alt="Trajectory synthesis: a query generator builds report requests and rubrics, a teacher model runs inside MIRA-Harness, and a synthesis gate checks rubric coverage and trajectory integrity before trajectories join MIRA-Data.">
+      <figcaption><b>Trajectory synthesis for illustrated reports.</b> A query generator constructs report-oriented
+        requests and internal rubrics. Kimi K2.6 generates trajectories within MIRA-Harness, and the synthesis gate
+        verifies rubric coverage and trajectory integrity. Accepted trajectories, mixed with general search
+        trajectories, form MIRA-Data.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap" aria-labelledby="results">
+    <h2 id="results">Main Results</h2>
+    <div class="table-scroll" role="region" aria-label="Main results table" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Model</th><th scope="col">Params</th><th scope="col">MMSearch</th><th scope="col">MMSearch-Plus</th>
+            <th scope="col">BrowseComp-VL</th><th scope="col">SimpleVQA</th><th scope="col">LiveVQA</th><th scope="col">FVQA</th>
+            <th scope="col">VDR-Bench</th><th scope="col">MMDeepResearch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group"><td colspan="10">Large-Scale Frontier Models</td></tr>
+          <tr><td>Kimi-K3</td><td>2.8T (104B)</td><td>89.26</td><td>60.00</td><td>60.32</td><td>83.33</td><td>91.23</td><td>82.46</td><td>22.86</td><td>54.32</td></tr>
+          <tr><td>Qwen3.5</td><td>397B (17B)</td><td>69.01</td><td>36.01</td><td>58.40</td><td>77.33</td><td>84.33</td><td>75.33</td><td>14.40</td><td>39.54</td></tr>
+          <tr><td>DeepSeek-V4.1-Flash</td><td>552B (8B/16B)</td><td>88.33</td><td>59.91</td><td>72.86</td><td>81.33</td><td>88.67</td><td>85.00</td><td>32.20</td><td>51.23</td></tr>
+          <tr class="group"><td colspan="10">Lightweight Multimodal Search Agents</td></tr>
+          <tr><td>OpenSearch-VL</td><td>30B (3B)</td><td>68.70</td><td>28.94</td><td>41.10</td><td>74.90</td><td>67.40</td><td>73.20</td><td>33.50</td><td>23.21</td></tr>
+          <tr><td>REDSearcher-MM</td><td>30B (3B)</td><td>72.90</td><td>26.60</td><td>57.20</td><td>&ndash;</td><td>79.30</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>Vision-DeepResearch</td><td>30B (3B)</td><td>69.60</td><td>28.50</td><td>53.70</td><td>66.33</td><td>77.60</td><td>74.20</td><td><b>37.80</b></td><td>12.78</td></tr>
+          <tr><td>WeAgent-MMSearch</td><td>30B (3B)</td><td>77.78</td><td>37.82</td><td>&ndash;</td><td>77.73</td><td>81.05</td><td><b>79.33</b></td><td>35.68</td><td>&ndash;</td></tr>
+          <tr class="sep"><td>Qwen3.6 w/o Harness</td><td>35B (3B)</td><td>30.41</td><td>3.86</td><td>28.91</td><td>58.00</td><td>56.67</td><td>34.11</td><td>1.80</td><td>26.78</td></tr>
+          <tr><td>Qwen3.6 w/ WeAgent Harness</td><td>35B (3B)</td><td>66.28</td><td>29.40</td><td>&ndash;</td><td>65.79</td><td>78.20</td><td>66.09</td><td>15.57</td><td>&ndash;</td></tr>
+          <tr><td>Qwen3.6 w/ Vanilla Harness</td><td>35B (3B)</td><td>67.84</td><td>28.94</td><td>51.01</td><td>72.24</td><td>73.67</td><td>65.67</td><td>15.00</td><td>37.95</td></tr>
+          <tr class="group"><td colspan="10">Ours</td></tr>
+          <tr class="ours"><td><b>MIRA-Base</b></td><td>35B (3B)</td><td>73.10</td><td>33.44</td><td>56.64</td><td>74.33</td><td>78.33</td><td>70.00</td><td>19.00</td><td>41.90</td></tr>
+          <tr class="delta"><td>&Delta; (MIRA-Base &minus; Vanilla)</td><td></td><td>+5.26</td><td>+4.50</td><td>+5.63</td><td>+2.09</td><td>+4.66</td><td>+4.33</td><td>+4.00</td><td>+3.95</td></tr>
+          <tr class="ours"><td><b>MIRA-SFT</b></td><td>35B (3B)</td><td><b>80.70</b></td><td><b>38.91</b></td><td><b>58.40</b></td><td><b>79.00</b></td><td><b>82.00</b></td><td><b>79.33</b></td><td>29.80</td><td><b>42.61</b></td></tr>
+          <tr class="delta"><td>&Delta; (MIRA-SFT &minus; MIRA-Base)</td><td></td><td>+7.60</td><td>+5.47</td><td>+1.76</td><td>+4.67</td><td>+3.67</td><td>+9.33</td><td>+10.80</td><td>+0.71</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Main results across eight multimodal search, knowledge-intensive VQA, and illustrated
+      deep-research benchmarks. Bold marks the best result outside the large-scale frontier models; &ldquo;&ndash;&rdquo; means not reported.</p>
+  </section>
+
+  <section class="wrap" aria-labelledby="cases">
+    <h2 id="cases">Report Examples</h2>
+    <p class="lead">One traffic-flow research request, delivered in both report modes. Each image shows one selected
+      page; neither shows the full report.</p>
+    <div class="cases">
+      <figure class="page">
+        <img src="assets/images/case_concise.png" width="1100" height="1800" loading="lazy"
+             alt="Page 1 of the two-page Concise report on the evolution of traffic flow visualization in civil engineering education, with a time-space diagram and a flow-density curve.">
+        <figcaption><b>Concise report.</b> Page 1 of 2: text and diagrams in the concise format.</figcaption>
+      </figure>
+      <figure class="page">
+        <img src="assets/images/case_detail.png" width="1100" height="1800" loading="lazy"
+             alt="Page 7 of the nine-page Detail report for the same request, with expanded discussion and accompanying visuals.">
+        <figcaption><b>Detail report.</b> Page 7 of 9: expanded discussion and accompanying visuals.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="bibtex">
+    <h2 id="bibtex">BibTeX</h2>
+<pre class="bibtex"><code>@article{mira2026,
+  title   = {MIRA: A Multimodal Illustrated Deep Research Agent for Controllable Reports},
+  author  = {Wu, Hongrui and Tuo, Kaiwen and Wang, Congcong and Li, Gen and Dong, Shuai and
+             Yu, Xinlei and Xu, Yuqi and Hou, Haowen and Peng, Zelin and Wang, Jiaqi},
+  year    = {2026}
+}</code></pre>
+  </section>
+</main>
+
+<footer class="wrap footer">
+  <p>Page layout inspired by the Nerfies project page.</p>
+</footer>
+</body>
+</html>
