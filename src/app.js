@@ -197,6 +197,7 @@ const colMax = Array.from({ length: nb }, (_, c) => Math.max(...groups.flatMap(g
 const bestOpen = Array.from({ length: nb }, (_, c) => Math.max(...groups.slice(1).flatMap(g => g.rows.map(r => r.vals[c] ?? -1))));
 let pinned = 'MIRA-Base', sortCol = null, sortDir = -1;
 function fmt(v) { return v == null ? '–' : v.toFixed(2); }
+const narrowTable = matchMedia('(max-width: 960px)');
 function renderTable() {
   const ref = groups.flatMap(g => g.rows).find(r => r.name === pinned);
   let h = `<table class="results"><colgroup><col class="c-model"><col class="c-params">${'<col>'.repeat(nb)}</colgroup><thead><tr>`;
@@ -204,7 +205,7 @@ function renderTable() {
   header.slice(2).forEach((b, c) => h += `<th data-col="${c + 2}">${b}<span class="sort">${sortCol === c ? (sortDir < 0 ? '▾' : '▴') : ''}</span></th>`);
   h += `</tr></thead><tbody>`;
   groups.forEach((g, gi) => {
-    h += `<tr class="group"><td colspan="${nb + 2}">${g.title}</td></tr>`;
+    h += `<tr class="group"><td colspan="${nb + (narrowTable.matches ? 1 : 2)}">${g.title}</td></tr>`;   // the Params column is hidden below 960px
     let rows = g.rows.slice();
     if (sortCol != null) rows.sort((a, b) => ((b.vals[sortCol] ?? -1) - (a.vals[sortCol] ?? -1)) * -sortDir);
     rows.forEach(r => {
@@ -224,6 +225,7 @@ function renderTable() {
   $('#pinName').textContent = pinned;
 }
 renderTable();
+narrowTable.addEventListener('change', renderTable);
 host.addEventListener('click', e => {
   const th = e.target.closest('thead th');
   if (th) {
@@ -255,10 +257,12 @@ function initSteps(key, listId, stageId, capId) {
   list.innerHTML = steps.map((st, i) => `<li><button type="button" data-i="${i}" aria-pressed="false"><span class="n">${st.n ?? i + 1}</span><span><b>${st.t}</b><span>${st.d}</span></span></button></li>`).join('');
   let locked = null, showing = null;
   function hole(i) {
+    // the lens box snaps to whole pixels and the copy gets the exact remainder, so the copy's paint rect equals the original's
     const [x, y, w, h] = steps[i].box, ir = img.getBoundingClientRect(), pr = spot.getBoundingClientRect();
-    const ox = ir.left - pr.left, oy = ir.top - pr.top, px = v => v.toFixed(1) + 'px';
-    Object.assign(lens.style, { left: px(ox + x / 100 * ir.width), top: px(oy + y / 100 * ir.height), width: px(w / 100 * ir.width), height: px(h / 100 * ir.height) });
-    Object.assign(copy.style, { left: px(-x / 100 * ir.width), top: px(-y / 100 * ir.height), width: px(ir.width), height: px(ir.height) });
+    const ox = ir.left - pr.left, oy = ir.top - pr.top;
+    const L = Math.round(ox + x / 100 * ir.width), T = Math.round(oy + y / 100 * ir.height), R = Math.round(ox + (x + w) / 100 * ir.width), B = Math.round(oy + (y + h) / 100 * ir.height);
+    Object.assign(lens.style, { left: L + 'px', top: T + 'px', width: (R - L) + 'px', height: (B - T) + 'px' });
+    Object.assign(copy.style, { left: (ox - L) + 'px', top: (oy - T) + 'px', width: ir.width + 'px', height: ir.height + 'px' });
   }
   function show(i) {
     $$('button', list).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.i === i)));
@@ -441,22 +445,20 @@ const article = $('#article'), articleBody = $('#articleBody'), modeSwitch = $('
 const book = $('#book'), view = $('#bookView'), pageNo = $('#pageNo'), pageDots = $('#pageDots'), prevBtn = $('#prevPage'), nextBtn = $('#nextPage');
 const secMenu = $('#secMenu'), gateMenu = $('#gateMenu'), toc = $('#toc');
 let pg = 0, pages = 1, ncol = 2, colw = 0, GAP = 48;
+function offX(el) { let x = 0; for (let e = el; e && e !== article; e = e.offsetParent) x += e.offsetLeft; return x; }   // layout position inside the article: exact in multicol, unaffected by the deck's transition transforms
 function measure() {
-  const w = view.clientWidth;
+  const w = parseFloat(getComputedStyle(view).width);   // fractional: the integer clientWidth would drift the pages by up to half a pixel each
   GAP = parseFloat(getComputedStyle(book).getPropertyValue('--book-gap')) || 48;
   ncol = w >= 860 ? 2 : 1;
   article.style.columnCount = ncol;
   colw = (w - (ncol - 1) * GAP) / ncol;
   article.style.setProperty('--pg-w', (w + GAP) + 'px');
-  const a = article.getBoundingClientRect(); let right = 0;   // the furthest fragment decides how many columns the report filled
-  $$('#articleBody *').forEach(el => { const r = el.getBoundingClientRect(); if (r.width || r.height) right = Math.max(right, r.right - a.left); });
+  let right = 0;
+  $$('#articleBody *').forEach(el => { if (el.offsetWidth || el.offsetHeight) right = Math.max(right, offX(el) + el.offsetWidth); });
   const cols = Math.max(1, Math.floor((right - 1) / (colw + GAP)) + 1);
   pages = Math.max(1, Math.ceil(cols / ncol));
 }
-function pageOf(el) {
-  const left = el.getBoundingClientRect().left - article.getBoundingClientRect().left;
-  return Math.max(0, Math.min(pages - 1, Math.floor(Math.floor((left + 2) / (colw + GAP)) / ncol)));
-}
+function pageOf(el) { return Math.max(0, Math.min(pages - 1, Math.floor(Math.floor((offX(el) + 2) / (colw + GAP)) / ncol))); }
 function paint() {
   article.style.setProperty('--pg', pg);
   pageNo.textContent = `Page ${pg + 1} of ${pages}`;
@@ -497,6 +499,7 @@ view.addEventListener('wheel', e => {   // a horizontal trackpad swipe turns the
   if (Math.abs(wheelAcc) > 60) { go(pg + (wheelAcc > 0 ? 1 : -1)); wheelAcc = 0; wheelLock = true; setTimeout(() => { wheelLock = false; wheelAcc = 0; }, 700); }
 }, { passive: false });
 view.addEventListener('scroll', () => { view.scrollLeft = 0; view.scrollTop = 0; });   // focus or anchors must never shift the hidden overflow
+view.addEventListener('focusin', e => { if (e.target !== view) { const p = pageOf(e.target); if (p !== pg) go(p); } });   // keyboard focus turns to the page that holds the focused element
 addEventListener('resize', () => { clearTimeout(reflowTimer); reflowTimer = setTimeout(() => reflow(), 120); });
 if (document.fonts) document.fonts.ready.then(scheduleReflow);
 document.addEventListener('click', e => { [secMenu, gateMenu].forEach(m => { if (m.open && !m.contains(e.target)) m.open = false; }); });
@@ -538,7 +541,7 @@ article.addEventListener('click', e => {
   const a = e.target.closest('a.cite, a.imgref');
   if (a) { e.preventDefault(); const t = $(a.getAttribute('href')); if (t) flashTo(t, a.classList.contains('imgref')); return; }
   const refn = e.target.closest('.rd-reflist li .rd-refn');
-  if (refn) { const first = $(`.cite[data-ref="${refn.closest('li').dataset.ref}"]`, article); if (first) flashTo(first, true); return; }
+  if (refn) { const first = $$(`.cite[data-ref="${refn.closest('li').dataset.ref}"]`, article).find(c => c.getBoundingClientRect().width); if (first) flashTo(first, true); return; }   // the first citation that is rendered (notes may be hidden)
   const tr = e.target.closest('.rd-trace'); if (tr) { tr.classList.toggle('open'); reflow(tr.closest('figure') || tr); return; }
   const iw = e.target.closest('.rd-imgwrap');
   if (iw) { const img = $('img', iw), fig = iw.closest('figure'); openLightbox(img.src, img.alt, $('figcaption', fig).textContent, $$('.rd-box', iw).map(b => b.outerHTML).join('')); }
