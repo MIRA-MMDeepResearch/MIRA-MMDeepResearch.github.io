@@ -669,9 +669,11 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .runs button:focus-visible, .bar .again:focus-visible { outline: 2px solid var(--t-red); outline-offset: 2px; }
 .bar .again { padding: calc(6px * var(--k)) calc(9px * var(--k)); }
 
-.screen { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; height: calc(540px * var(--k)); }   /* long lines clip with an ellipsis instead of widening the card */
+.screen { --gx: calc(72px * var(--k)); position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; height: calc(540px * var(--k)); }   /* long lines clip with an ellipsis instead of widening the card; --gx is the content's side gutter inside the frame */
+@media (max-width: 1099px) { .screen { --gx: calc(32px * var(--k)); } }
+@media (max-width: 860px) { .screen { --gx: calc(18px * var(--k)); } }
 /* welcome box, as in a coding-agent terminal: the mascot, what the harness offers, and the live contract */
-.welcome { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(calc(220px * var(--k)), calc(300px * var(--k))); gap: calc(20px * var(--k)); align-items: center; margin: calc(14px * var(--k)) calc(16px * var(--k)) calc(4px * var(--k)); padding: calc(12px * var(--k)) calc(18px * var(--k)) calc(12px * var(--k)) calc(14px * var(--k)); border: 1px solid rgba(255,91,76,.5); border-radius: calc(10px * var(--k)); background: var(--t-panel); }
+.welcome { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(calc(220px * var(--k)), calc(300px * var(--k))); gap: calc(20px * var(--k)); align-items: center; margin: calc(14px * var(--k)) var(--gx) calc(4px * var(--k)); padding: calc(12px * var(--k)) calc(18px * var(--k)) calc(12px * var(--k)) calc(14px * var(--k)); border: 1px solid rgba(255,91,76,.5); border-radius: calc(10px * var(--k)); background: var(--t-panel); }
 /* Joy in a handful of blocks: head, ears, eyes, nose, red collar, and the red magnifier; every move is a whole-pixel step */
 .dog { position: relative; width: calc(102px * var(--k)); height: calc(66px * var(--k)); --p: calc(6px * var(--k)); }
 .dog svg { position: absolute; left: 0; bottom: 0; width: calc(102px * var(--k)); height: calc(54px * var(--k)); overflow: visible; shape-rendering: crispEdges; }
@@ -717,7 +719,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .meter .val small { color: var(--t-faint); font-size: inherit; }
 
 /* the log: lines stack from the bottom, older ones fade out at the top */
-.log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 calc(18px * var(--k)) calc(4px * var(--k));
+.log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 calc(var(--gx) + 2px) calc(4px * var(--k));
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 calc(46px * var(--k))); mask-image: linear-gradient(to bottom, transparent 0, #000 calc(46px * var(--k))); }
 .log > * { flex: none; }   /* rows never shrink; the oldest slide out of view at the top instead */
 .log.fade { opacity: 0; transition: opacity .5s linear; }
@@ -752,7 +754,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .ln.done { color: var(--t-green); margin-top: calc(4px * var(--k)); }
 
 /* slash-command menu and input box */
-.menu { position: absolute; left: calc(16px * var(--k)); right: calc(16px * var(--k)); bottom: calc(82px * var(--k)); z-index: 3; border: 1px solid var(--t-line); border-radius: calc(8px * var(--k)); background: #1F080D; padding: calc(6px * var(--k)); display: grid; gap: 2px;
+.menu { position: absolute; left: var(--gx); right: var(--gx); bottom: calc(82px * var(--k)); z-index: 3; border: 1px solid var(--t-line); border-radius: calc(8px * var(--k)); background: #1F080D; padding: calc(6px * var(--k)); display: grid; gap: 2px;
   box-shadow: 0 calc(18px * var(--k)) calc(40px * var(--k)) calc(-18px * var(--k)) rgba(0,0,0,.8); opacity: 0; transform: translateY(calc(6px * var(--k))); transition: opacity .15s, transform .15s var(--ease); pointer-events: none; }
 .menu.on { opacity: 1; transform: none; }
 .menu .it { display: grid; grid-template-columns: 17ch minmax(0, 1fr); gap: calc(14px * var(--k)); padding: calc(5px * var(--k)) calc(10px * var(--k)); border-radius: calc(5px * var(--k)); color: var(--t-dim); white-space: nowrap; }
@@ -760,7 +762,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .menu .it span { overflow: hidden; text-overflow: ellipsis; }
 .menu .it.hi { background: rgba(255,91,76,.18); color: var(--t-fg); }
 .menu .it.hi b { color: #fff; }
-.prompt { margin: calc(8px * var(--k)) calc(16px * var(--k)) 0; padding: calc(9px * var(--k)) calc(12px * var(--k)); border: 1px solid var(--t-line); border-radius: calc(9px * var(--k)); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: calc(10px * var(--k)); align-items: start; background: rgba(0,0,0,.18); }
+.prompt { margin: calc(8px * var(--k)) var(--gx) 0; padding: calc(9px * var(--k)) calc(12px * var(--k)); border: 1px solid var(--t-line); border-radius: calc(9px * var(--k)); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: calc(10px * var(--k)); align-items: start; background: rgba(0,0,0,.18); }
 .prompt .chev { color: var(--t-red); font-weight: 600; }
 .prompt .text { white-space: pre-wrap; max-height: 3.2em; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 1.6em; }
 .prompt .text .ph { color: var(--t-faint); }
@@ -769,7 +771,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .prompt .text .paste.settled { background: transparent; }
 .caret { display: inline-block; width: .6em; height: 1.15em; vertical-align: -.2em; background: var(--t-fg); animation: blink 1s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-.status { display: flex; justify-content: space-between; gap: calc(16px * var(--k)); padding: calc(7px * var(--k)) calc(18px * var(--k)) calc(12px * var(--k)); font-size: calc(12px * var(--k)); color: var(--t-dim); }
+.status { display: flex; justify-content: space-between; gap: calc(16px * var(--k)); padding: calc(7px * var(--k)) calc(var(--gx) + 2px) calc(12px * var(--k)); font-size: calc(12px * var(--k)); color: var(--t-dim); }
 .status .l { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .status .spin { color: var(--t-red); display: inline-block; width: 1.4ch; }
 .status .verb { color: var(--t-fg); }
@@ -777,10 +779,28 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .status .paused { color: var(--t-amber); }
 
 /* the report pops out when the gate says OK */
-.report { position: absolute; z-index: 4; right: calc(20px * var(--k)); bottom: calc(92px * var(--k)); width: min(calc(420px * var(--k)), calc(100% - calc(40px * var(--k)))); padding: calc(14px * var(--k)) calc(16px * var(--k)) calc(14px * var(--k)); border-radius: calc(12px * var(--k)); background: var(--card-bg); color: var(--card-ink);
+.report { position: absolute; z-index: 4; right: calc(var(--gx) + calc(4px * var(--k))); bottom: calc(92px * var(--k)); width: min(calc(420px * var(--k)), calc(100% - 2 * var(--gx) - calc(8px * var(--k)))); display: block; text-decoration: none; cursor: pointer; visibility: hidden; padding: calc(14px * var(--k)) calc(16px * var(--k)) calc(14px * var(--k)); border-radius: calc(12px * var(--k)); background: var(--card-bg); color: var(--card-ink);
   font: calc(14px * var(--k))/1.45 var(--font-body); box-shadow: 0 calc(30px * var(--k)) calc(60px * var(--k)) calc(-24px * var(--k)) rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.4);
-  opacity: 0; transform: translateY(calc(18px * var(--k))) scale(.96); transform-origin: 80% 100%; transition: opacity .3s linear, transform .45s var(--ease); pointer-events: none; }
-.report.on { opacity: 1; transform: none; }
+  opacity: 0; transform: translateY(calc(18px * var(--k))) scale(.96); transform-origin: 80% 100%; pointer-events: none; }
+.report { transition: opacity .3s linear, transform .45s var(--ease), box-shadow .25s, visibility 0s linear .45s; }
+.report.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.report.on:hover { transform: translateY(calc(-3px * var(--k))); box-shadow: 0 calc(36px * var(--k)) calc(64px * var(--k)) calc(-24px * var(--k)) rgba(0,0,0,.8), 0 0 0 2px #DA291C; }
+.report:focus-visible { outline: 2px solid #FFD6DA; outline-offset: calc(3px * var(--k)); }
+.report .go { display: flex; justify-content: space-between; align-items: center; margin-top: calc(10px * var(--k)); padding-top: calc(9px * var(--k)); border-top: 1px solid rgba(42,11,16,.1);
+  font: 600 calc(13px * var(--k))/1 var(--font-body); color: #C2241A; }
+.report .go .arr { display: inline-grid; place-items: center; width: calc(22px * var(--k)); height: calc(22px * var(--k)); border-radius: 50%; background: #DA291C; color: #fff; font-size: calc(12px * var(--k)); transition: transform .25s var(--ease); }
+.report.on:hover .go span:first-child { text-decoration: underline; text-underline-offset: calc(3px * var(--k)); }
+.report.on:hover .go .arr { transform: translateY(2px); }
+/* the pointer: it glides in from below left, then keeps tapping the link line until the reader's own pointer arrives */
+.report .ptr { position: absolute; right: calc(30px * var(--k)); bottom: calc(6px * var(--k)); width: calc(20px * var(--k)); height: calc(25px * var(--k)); pointer-events: none; opacity: 0; filter: drop-shadow(0 calc(3px * var(--k)) calc(4px * var(--k)) rgba(0,0,0,.45)); }
+.report .ptr svg { display: block; width: 100%; height: 100%; fill: #fff; stroke: #1A0609; stroke-width: 1.4px; stroke-linejoin: round; }
+.report .ptr::before { content: ""; position: absolute; left: calc(-9px * var(--k)); top: calc(-9px * var(--k)); width: calc(20px * var(--k)); height: calc(20px * var(--k)); border-radius: 50%; border: 2px solid #DA291C; opacity: 0; }
+.report.on .ptr { animation: ptr-in .8s var(--ease) .9s both, ptr-tap 1.5s ease-in-out 1.7s infinite; }
+.report.on .ptr::before { animation: ptr-ring 1.5s ease-out 1.7s infinite; }
+.report.on:hover .ptr { opacity: 0; animation: none; }
+@keyframes ptr-in { from { opacity: 0; transform: translate(calc(-90px * var(--k)), calc(70px * var(--k))); } to { opacity: 1; transform: none; } }
+@keyframes ptr-tap { 0%, 40%, 100% { opacity: 1; transform: none; } 20% { opacity: 1; transform: scale(.86); } }
+@keyframes ptr-ring { 0%, 12% { opacity: 0; transform: scale(.3); } 20% { opacity: .9; } 60%, 100% { opacity: 0; transform: scale(1.6); } }
 .report .top { display: flex; align-items: center; gap: calc(10px * var(--k)); font: 500 calc(12px * var(--k))/1 var(--font-mono); color: var(--card-muted); }
 .report .file { width: calc(18px * var(--k)); height: calc(22px * var(--k)); border-radius: 2px calc(7px * var(--k)) 2px 2px; background: linear-gradient(225deg, transparent calc(6px * var(--k)), #DA291C 0); flex: none; }
 .report .top b { color: var(--card-ink); font-weight: 600; }
@@ -804,7 +824,8 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
   .screen { height: calc(600px * var(--k)); }
   .bar .name { display: none; }
   .runs button .t { display: none; }
-  .welcome { margin: calc(10px * var(--k)) calc(10px * var(--k)) calc(4px * var(--k)); padding: calc(10px * var(--k)) calc(12px * var(--k)); }
+  .screen { --gx: calc(10px * var(--k)); }
+  .welcome { margin-top: calc(10px * var(--k)); padding: calc(10px * var(--k)) calc(12px * var(--k)); }
   .dog { width: calc(85px * var(--k)); height: calc(56px * var(--k)); }
   .dog svg { width: calc(85px * var(--k)); height: calc(45px * var(--k)); }
   .dog .lens { left: calc(40px * var(--k)); top: calc(-22px * var(--k)); width: calc(56px * var(--k)); height: calc(56px * var(--k)); }
@@ -812,13 +833,12 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
   .meters { grid-template-columns: 1fr; gap: calc(6px * var(--k)); }
   .meter { grid-template-columns: 9ch minmax(0, 1fr) auto; grid-template-areas: none; gap: calc(8px * var(--k)); }
   .meter .lab, .meter .track, .meter .val { grid-area: auto; }
-  .log { padding: 0 calc(12px * var(--k)) calc(4px * var(--k)); }
-  .prompt { margin: calc(6px * var(--k)) calc(10px * var(--k)) 0; }
-  .menu { left: calc(10px * var(--k)); right: calc(10px * var(--k)); bottom: calc(76px * var(--k)); }
+  .prompt { margin-top: calc(6px * var(--k)); }
+  .menu { bottom: calc(76px * var(--k)); }
   .menu .it { grid-template-columns: 1fr; gap: 0; }
-  .status { padding: calc(6px * var(--k)) calc(12px * var(--k)) calc(10px * var(--k)); }
+  .status { padding-top: calc(6px * var(--k)); padding-bottom: calc(10px * var(--k)); }
   .status .r { display: none; }
-  .report { right: calc(10px * var(--k)); width: calc(100% - calc(20px * var(--k))); bottom: calc(84px * var(--k)); }
+  .report { bottom: calc(84px * var(--k)); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
@@ -847,7 +867,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
       <div class="prompt"><span class="chev">›</span><div class="text" id="ptext"></div></div>
       <div class="status"><span class="l" id="stl"></span><span class="r" id="str">replay of a recorded run · time compressed</span></div>
       <div class="menu" id="menu"></div>
-      <div class="report" id="report"></div>
+      <a class="report" id="report" href="#case"></a>
     </div>
   </div>
 </template>
@@ -1238,10 +1258,19 @@ function attract() {
     return { lenOk, imgBad, refBad };
   }
 
-  /* ---------- the report card ---------- */
-  function showReport(run) {
+  /* ---------- the report card: it links to the same report in the case study, and a pointer glides in to say so ---------- */
+  let cardHeld = false;
+  report.addEventListener('click', e => { e.preventDefault(); openCaseReport(report.dataset.case, report.dataset.mode); });
+  report.addEventListener('pointerenter', () => { cardHeld = true; });
+  report.addEventListener('pointerleave', () => { cardHeld = false; });
+  report.addEventListener('focus', () => { cardHeld = true; });
+  report.addEventListener('blur', () => { cardHeld = false; });
+  const POINTER = '<svg viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1v15l4-4 3 6.5 2.6-1.2-3-6.3H13z"/></svg>';
+  function showReport(key, run) {
     const f = run.final;
     report.textContent = '';
+    report.dataset.case = key; report.dataset.mode = run.mode;
+    report.setAttribute('aria-label', `Read the ${run.mode} report “${run.title}” in the case study`);
     const top = el('div', 'top'); top.append(el('i', 'file'), el('b', null, 'report.md'), el('span', null, 'accepted draft'), el('span', 'pill', run.mode));
     const figs = el('div', 'figs'), max = narrow() ? 4 : 5;
     run.cited.slice(0, max).forEach(h => { const i = el('img'); i.src = run.thumbs[h]; i.alt = ''; figs.append(i); });
@@ -1250,6 +1279,8 @@ function attract() {
     report.append(top, el('h3', null, run.title),
       el('div', 'stats', `${fmt(f.chars)} chars · ${f.examined_images_cited} images · ${f.opened_sources_cited} sources · ${turns} turns · ${run.calls} calls · ${clock(run.secs)}`), figs);
     const seal = el('div', 'seal'); seal.append(el('b', null, '✓ report gate OK'), ' · the delivered file is the accepted draft, unchanged'); report.append(seal);
+    const go = el('div', 'go'); go.append(el('span', null, 'Read it in the case study'), el('span', 'arr', '↓')); report.append(go);
+    const ptr = el('i', 'ptr'); ptr.innerHTML = POINTER; report.append(ptr);
     report.classList.add('on');
   }
 
@@ -1310,8 +1341,9 @@ function attract() {
     st.verb = 'Done'; st.done = true; drawStatus();
     line('done', `✓ report.md delivered · ${fmt(run.final.chars)} chars · ${run.final.examined_images_cited} images · ${run.final.opened_sources_cited} sources · ${run.turns.length} turns · ${run.calls} calls · ${clock(run.secs)} recorded`);
     mood('happy', '✓', 'ok');
-    showReport(run);
-    await step(5200, my);
+    showReport(key, run);
+    await step(6400, my);
+    while (cardHeld) await step(200, my);   // a reader on the card keeps it up
     report.classList.remove('on'); log.classList.add('fade'); mood('idle');
     await step(700, my);
   }
@@ -1915,21 +1947,31 @@ let tourW = innerWidth;
 addEventListener('resize', () => { if (innerWidth === tourW) return replaceTip(); tourW = innerWidth; if (tourT || tourAt >= 0) endTour(); });
 
 /* ---------- switching requests ---------- */
-function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); renderReport(); }
-function switchCase(k) {
+function loadCase(k, mode) { cur = k; CUR = CASES[k]; curMode = mode || 'concise'; renderHead(); renderReport(); }
+function switchCase(k, mode) {
   if (k === cur || turning) return;
   endTour();
   const top = deck.getBoundingClientRect().top;
   if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes
-  if (reduce) { loadCase(k); return; }
+  if (reduce) { loadCase(k, mode); return; }
   turning = true; casePage.classList.add('out');
   setTimeout(() => {
-    loadCase(k);
+    loadCase(k, mode);
     casePage.classList.remove('out'); casePage.classList.add('in'); void casePage.offsetWidth; casePage.classList.remove('in');
     setTimeout(() => { turning = false; }, 460);
   }, 240);
 }
 loadCase(0);
+/* the terminal's report card lands here: the deck scrolls into view, then turns to that request in that mode */
+function openCaseReport(id, mode) {
+  const k = CASES.findIndex(c => c.id === id);
+  if (k < 0) return;
+  scrollTo({ top: deck.getBoundingClientRect().top + scrollY - 76, behavior: reduce ? 'auto' : 'smooth' });
+  setTimeout(() => {
+    if (k !== cur) switchCase(k, mode);
+    else if (curMode !== mode) { curMode = mode; renderReport(); }
+  }, reduce ? 0 : 700);
+}
 
 /* ---------- lightbox ---------- */
 const lb = $('#lb'), lbImg = $('#lbImg'), lbPan = $('#lbPan'), lbBoxes = $('#lbBoxes'), lbCap = $('#lbCap');

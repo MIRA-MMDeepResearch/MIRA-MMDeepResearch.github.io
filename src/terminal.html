@@ -24,9 +24,11 @@
 .runs button:focus-visible, .bar .again:focus-visible { outline: 2px solid var(--t-red); outline-offset: 2px; }
 .bar .again { padding: 6px 9px; }
 
-.screen { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; height: 540px; }   /* long lines clip with an ellipsis instead of widening the card */
+.screen { --gx: 72px; position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; height: 540px; }   /* long lines clip with an ellipsis instead of widening the card; --gx is the content's side gutter inside the frame */
+@media (max-width: 1099px) { .screen { --gx: 32px; } }
+@media (max-width: 860px) { .screen { --gx: 18px; } }
 /* welcome box, as in a coding-agent terminal: the mascot, what the harness offers, and the live contract */
-.welcome { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); gap: 20px; align-items: center; margin: 14px 16px 4px; padding: 12px 18px 12px 14px; border: 1px solid rgba(255,91,76,.5); border-radius: 10px; background: var(--t-panel); }
+.welcome { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); gap: 20px; align-items: center; margin: 14px var(--gx) 4px; padding: 12px 18px 12px 14px; border: 1px solid rgba(255,91,76,.5); border-radius: 10px; background: var(--t-panel); }
 /* Joy in a handful of blocks: head, ears, eyes, nose, red collar, and the red magnifier; every move is a whole-pixel step */
 .dog { position: relative; width: 102px; height: 66px; --p: 6px; }
 .dog svg { position: absolute; left: 0; bottom: 0; width: 102px; height: 54px; overflow: visible; shape-rendering: crispEdges; }
@@ -72,7 +74,7 @@
 .meter .val small { color: var(--t-faint); font-size: inherit; }
 
 /* the log: lines stack from the bottom, older ones fade out at the top */
-.log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 18px 4px;
+.log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 calc(var(--gx) + 2px) 4px;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 46px); mask-image: linear-gradient(to bottom, transparent 0, #000 46px); }
 .log > * { flex: none; }   /* rows never shrink; the oldest slide out of view at the top instead */
 .log.fade { opacity: 0; transition: opacity .5s linear; }
@@ -107,7 +109,7 @@
 .ln.done { color: var(--t-green); margin-top: 4px; }
 
 /* slash-command menu and input box */
-.menu { position: absolute; left: 16px; right: 16px; bottom: 82px; z-index: 3; border: 1px solid var(--t-line); border-radius: 8px; background: #1F080D; padding: 6px; display: grid; gap: 2px;
+.menu { position: absolute; left: var(--gx); right: var(--gx); bottom: 82px; z-index: 3; border: 1px solid var(--t-line); border-radius: 8px; background: #1F080D; padding: 6px; display: grid; gap: 2px;
   box-shadow: 0 18px 40px -18px rgba(0,0,0,.8); opacity: 0; transform: translateY(6px); transition: opacity .15s, transform .15s var(--ease); pointer-events: none; }
 .menu.on { opacity: 1; transform: none; }
 .menu .it { display: grid; grid-template-columns: 17ch minmax(0, 1fr); gap: 14px; padding: 5px 10px; border-radius: 5px; color: var(--t-dim); white-space: nowrap; }
@@ -115,7 +117,7 @@
 .menu .it span { overflow: hidden; text-overflow: ellipsis; }
 .menu .it.hi { background: rgba(255,91,76,.18); color: var(--t-fg); }
 .menu .it.hi b { color: #fff; }
-.prompt { margin: 8px 16px 0; padding: 9px 12px; border: 1px solid var(--t-line); border-radius: 9px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; background: rgba(0,0,0,.18); }
+.prompt { margin: 8px var(--gx) 0; padding: 9px 12px; border: 1px solid var(--t-line); border-radius: 9px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; background: rgba(0,0,0,.18); }
 .prompt .chev { color: var(--t-red); font-weight: 600; }
 .prompt .text { white-space: pre-wrap; max-height: 3.2em; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 1.6em; }
 .prompt .text .ph { color: var(--t-faint); }
@@ -124,7 +126,7 @@
 .prompt .text .paste.settled { background: transparent; }
 .caret { display: inline-block; width: .6em; height: 1.15em; vertical-align: -.2em; background: var(--t-fg); animation: blink 1s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-.status { display: flex; justify-content: space-between; gap: 16px; padding: 7px 18px 12px; font-size: 12px; color: var(--t-dim); }
+.status { display: flex; justify-content: space-between; gap: 16px; padding: 7px calc(var(--gx) + 2px) 12px; font-size: 12px; color: var(--t-dim); }
 .status .l { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .status .spin { color: var(--t-red); display: inline-block; width: 1.4ch; }
 .status .verb { color: var(--t-fg); }
@@ -132,10 +134,28 @@
 .status .paused { color: var(--t-amber); }
 
 /* the report pops out when the gate says OK */
-.report { position: absolute; z-index: 4; right: 20px; bottom: 92px; width: min(420px, calc(100% - 40px)); padding: 14px 16px 14px; border-radius: 12px; background: var(--card-bg); color: var(--card-ink);
+.report { position: absolute; z-index: 4; right: calc(var(--gx) + 4px); bottom: 92px; width: min(420px, calc(100% - 2 * var(--gx) - 8px)); display: block; text-decoration: none; cursor: pointer; visibility: hidden; padding: 14px 16px 14px; border-radius: 12px; background: var(--card-bg); color: var(--card-ink);
   font: 14px/1.45 var(--font-body); box-shadow: 0 30px 60px -24px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.4);
-  opacity: 0; transform: translateY(18px) scale(.96); transform-origin: 80% 100%; transition: opacity .3s linear, transform .45s var(--ease); pointer-events: none; }
-.report.on { opacity: 1; transform: none; }
+  opacity: 0; transform: translateY(18px) scale(.96); transform-origin: 80% 100%; pointer-events: none; }
+.report { transition: opacity .3s linear, transform .45s var(--ease), box-shadow .25s, visibility 0s linear .45s; }
+.report.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.report.on:hover { transform: translateY(-3px); box-shadow: 0 36px 64px -24px rgba(0,0,0,.8), 0 0 0 2px #DA291C; }
+.report:focus-visible { outline: 2px solid #FFD6DA; outline-offset: 3px; }
+.report .go { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 9px; border-top: 1px solid rgba(42,11,16,.1);
+  font: 600 13px/1 var(--font-body); color: #C2241A; }
+.report .go .arr { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #DA291C; color: #fff; font-size: 12px; transition: transform .25s var(--ease); }
+.report.on:hover .go span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+.report.on:hover .go .arr { transform: translateY(2px); }
+/* the pointer: it glides in from below left, then keeps tapping the link line until the reader's own pointer arrives */
+.report .ptr { position: absolute; right: 30px; bottom: 6px; width: 20px; height: 25px; pointer-events: none; opacity: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
+.report .ptr svg { display: block; width: 100%; height: 100%; fill: #fff; stroke: #1A0609; stroke-width: 1.4px; stroke-linejoin: round; }
+.report .ptr::before { content: ""; position: absolute; left: -9px; top: -9px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #DA291C; opacity: 0; }
+.report.on .ptr { animation: ptr-in .8s var(--ease) .9s both, ptr-tap 1.5s ease-in-out 1.7s infinite; }
+.report.on .ptr::before { animation: ptr-ring 1.5s ease-out 1.7s infinite; }
+.report.on:hover .ptr { opacity: 0; animation: none; }
+@keyframes ptr-in { from { opacity: 0; transform: translate(-90px, 70px); } to { opacity: 1; transform: none; } }
+@keyframes ptr-tap { 0%, 40%, 100% { opacity: 1; transform: none; } 20% { opacity: 1; transform: scale(.86); } }
+@keyframes ptr-ring { 0%, 12% { opacity: 0; transform: scale(.3); } 20% { opacity: .9; } 60%, 100% { opacity: 0; transform: scale(1.6); } }
 .report .top { display: flex; align-items: center; gap: 10px; font: 500 12px/1 var(--font-mono); color: var(--card-muted); }
 .report .file { width: 18px; height: 22px; border-radius: 2px 7px 2px 2px; background: linear-gradient(225deg, transparent 6px, #DA291C 0); flex: none; }
 .report .top b { color: var(--card-ink); font-weight: 600; }
@@ -159,7 +179,8 @@
   .screen { height: 600px; }
   .bar .name { display: none; }
   .runs button .t { display: none; }
-  .welcome { margin: 10px 10px 4px; padding: 10px 12px; }
+  .screen { --gx: 10px; }
+  .welcome { margin-top: 10px; padding: 10px 12px; }
   .dog { width: 85px; height: 56px; }
   .dog svg { width: 85px; height: 45px; }
   .dog .lens { left: 40px; top: -22px; width: 56px; height: 56px; }
@@ -167,13 +188,12 @@
   .meters { grid-template-columns: 1fr; gap: 6px; }
   .meter { grid-template-columns: 9ch minmax(0, 1fr) auto; grid-template-areas: none; gap: 8px; }
   .meter .lab, .meter .track, .meter .val { grid-area: auto; }
-  .log { padding: 0 12px 4px; }
-  .prompt { margin: 6px 10px 0; }
-  .menu { left: 10px; right: 10px; bottom: 76px; }
+  .prompt { margin-top: 6px; }
+  .menu { bottom: 76px; }
   .menu .it { grid-template-columns: 1fr; gap: 0; }
-  .status { padding: 6px 12px 10px; }
+  .status { padding-top: 6px; padding-bottom: 10px; }
   .status .r { display: none; }
-  .report { right: 10px; width: calc(100% - 20px); bottom: 84px; }
+  .report { bottom: 84px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
@@ -202,6 +222,6 @@
       <div class="prompt"><span class="chev">›</span><div class="text" id="ptext"></div></div>
       <div class="status"><span class="l" id="stl"></span><span class="r" id="str">replay of a recorded run · time compressed</span></div>
       <div class="menu" id="menu"></div>
-      <div class="report" id="report"></div>
+      <a class="report" id="report" href="#case"></a>
     </div>
   </div>

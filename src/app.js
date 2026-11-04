@@ -229,10 +229,19 @@ function attract() {
     return { lenOk, imgBad, refBad };
   }
 
-  /* ---------- the report card ---------- */
-  function showReport(run) {
+  /* ---------- the report card: it links to the same report in the case study, and a pointer glides in to say so ---------- */
+  let cardHeld = false;
+  report.addEventListener('click', e => { e.preventDefault(); openCaseReport(report.dataset.case, report.dataset.mode); });
+  report.addEventListener('pointerenter', () => { cardHeld = true; });
+  report.addEventListener('pointerleave', () => { cardHeld = false; });
+  report.addEventListener('focus', () => { cardHeld = true; });
+  report.addEventListener('blur', () => { cardHeld = false; });
+  const POINTER = '<svg viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1v15l4-4 3 6.5 2.6-1.2-3-6.3H13z"/></svg>';
+  function showReport(key, run) {
     const f = run.final;
     report.textContent = '';
+    report.dataset.case = key; report.dataset.mode = run.mode;
+    report.setAttribute('aria-label', `Read the ${run.mode} report “${run.title}” in the case study`);
     const top = el('div', 'top'); top.append(el('i', 'file'), el('b', null, 'report.md'), el('span', null, 'accepted draft'), el('span', 'pill', run.mode));
     const figs = el('div', 'figs'), max = narrow() ? 4 : 5;
     run.cited.slice(0, max).forEach(h => { const i = el('img'); i.src = run.thumbs[h]; i.alt = ''; figs.append(i); });
@@ -241,6 +250,8 @@ function attract() {
     report.append(top, el('h3', null, run.title),
       el('div', 'stats', `${fmt(f.chars)} chars · ${f.examined_images_cited} images · ${f.opened_sources_cited} sources · ${turns} turns · ${run.calls} calls · ${clock(run.secs)}`), figs);
     const seal = el('div', 'seal'); seal.append(el('b', null, '✓ report gate OK'), ' · the delivered file is the accepted draft, unchanged'); report.append(seal);
+    const go = el('div', 'go'); go.append(el('span', null, 'Read it in the case study'), el('span', 'arr', '↓')); report.append(go);
+    const ptr = el('i', 'ptr'); ptr.innerHTML = POINTER; report.append(ptr);
     report.classList.add('on');
   }
 
@@ -301,8 +312,9 @@ function attract() {
     st.verb = 'Done'; st.done = true; drawStatus();
     line('done', `✓ report.md delivered · ${fmt(run.final.chars)} chars · ${run.final.examined_images_cited} images · ${run.final.opened_sources_cited} sources · ${run.turns.length} turns · ${run.calls} calls · ${clock(run.secs)} recorded`);
     mood('happy', '✓', 'ok');
-    showReport(run);
-    await step(5200, my);
+    showReport(key, run);
+    await step(6400, my);
+    while (cardHeld) await step(200, my);   // a reader on the card keeps it up
     report.classList.remove('on'); log.classList.add('fade'); mood('idle');
     await step(700, my);
   }
@@ -906,21 +918,31 @@ let tourW = innerWidth;
 addEventListener('resize', () => { if (innerWidth === tourW) return replaceTip(); tourW = innerWidth; if (tourT || tourAt >= 0) endTour(); });
 
 /* ---------- switching requests ---------- */
-function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); renderReport(); }
-function switchCase(k) {
+function loadCase(k, mode) { cur = k; CUR = CASES[k]; curMode = mode || 'concise'; renderHead(); renderReport(); }
+function switchCase(k, mode) {
   if (k === cur || turning) return;
   endTour();
   const top = deck.getBoundingClientRect().top;
   if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes
-  if (reduce) { loadCase(k); return; }
+  if (reduce) { loadCase(k, mode); return; }
   turning = true; casePage.classList.add('out');
   setTimeout(() => {
-    loadCase(k);
+    loadCase(k, mode);
     casePage.classList.remove('out'); casePage.classList.add('in'); void casePage.offsetWidth; casePage.classList.remove('in');
     setTimeout(() => { turning = false; }, 460);
   }, 240);
 }
 loadCase(0);
+/* the terminal's report card lands here: the deck scrolls into view, then turns to that request in that mode */
+function openCaseReport(id, mode) {
+  const k = CASES.findIndex(c => c.id === id);
+  if (k < 0) return;
+  scrollTo({ top: deck.getBoundingClientRect().top + scrollY - 76, behavior: reduce ? 'auto' : 'smooth' });
+  setTimeout(() => {
+    if (k !== cur) switchCase(k, mode);
+    else if (curMode !== mode) { curMode = mode; renderReport(); }
+  }, reduce ? 0 : 700);
+}
 
 /* ---------- lightbox ---------- */
 const lb = $('#lb'), lbImg = $('#lbImg'), lbPan = $('#lbPan'), lbBoxes = $('#lbBoxes'), lbCap = $('#lbCap');
