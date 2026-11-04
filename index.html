@@ -52,7 +52,6 @@
       <a class="btn" href="https://huggingface.co/datasets/MIRA-MMDeepResearch/MIRA-Harness-Data-4K">Data <small>Harness</small></a>
       <a class="btn" href="https://huggingface.co/datasets/MIRA-MMDeepResearch/MIRA-General-Data-20K">Data <small>General</small></a>
     </nav>
-    <p class="release-note">Weights and data are on <a href="https://huggingface.co/MIRA-MMDeepResearch">Hugging Face</a>; code is on <a href="https://github.com/MIRA-MMDeepResearch/MIRA">GitHub</a>.</p>
   </div>
 </header>
 
@@ -60,8 +59,8 @@
   <section class="wrap teaser" aria-labelledby="teaser-caption">
     <figure>
       <img src="assets/images/results_chart.png" width="2400" height="722"
-           alt="Bar chart of scores on eight benchmarks. MIRA-SFT scores 80.7 on MMSearch, 38.9 on MMSearch-Plus, 58.4 on BrowseComp-VL, 79.0 on SimpleVQA, 82.0 on LiveVQA, 79.3 on FVQA, 29.8 on VDR-Bench and 42.6 on MMDeepResearch, compared with Qwen3.6-35B-A3B, WeAgent-MMSearch, OpenSearch-VL, DeepSeek-V4.1-Flash and Kimi-K3.">
-      <figcaption id="teaser-caption">MIRA-SFT versus open agents and frontier models on eight benchmarks.</figcaption>
+           alt="Bar chart of benchmark scores. MIRA-SFT scores 80.7 on MMSearch, 38.9 on MMSearch-Plus, 58.4 on BrowseComp-VL, 79.0 on SimpleVQA, 82.0 on LiveVQA, 79.3 on FVQA, 29.8 on VDR-Bench and 42.6 on MMDeepResearch, compared with Qwen3.6-35B-A3B, WeAgent-MMSearch, OpenSearch-VL, DeepSeek-V4.1-Flash and Kimi-K3.">
+      <figcaption id="teaser-caption">MIRA-SFT versus open agents and frontier models across the benchmarks.</figcaption>
     </figure>
   </section>
 
@@ -72,8 +71,10 @@
       often need: an illustrated report with the requested depth, images, and traceable sources.
       <b>MIRA</b> turns these requirements into generation contracts. <b>MIRA-Harness</b> gathers textual and
       visual evidence, checks each submitted draft against the contract, and revises until it is satisfied;
-      <b>MIRA-Data</b> turns this workflow into training trajectories. Built on Qwen3.6-35B-A3B, MIRA-SFT is the
-      strongest of the compared open agents on seven of eight benchmarks.
+      <b>MIRA-Data</b> turns this workflow into training trajectories. Using Qwen3.6-35B-A3B, MIRA achieves
+      state-of-the-art performance among open agents on 7 representative, established multimodal-search and
+      deep-research-agent benchmarks, while producing user-aligned illustrated reports with traceable textual
+      and visual evidence.
     </p>
   </section>
 
@@ -82,7 +83,7 @@
     <ul class="highlights">
       <li><b>Controllable reports.</b> Users set report depth, visual composition, and evidence grounding.</li>
       <li><b>Harness + data.</b> Contracts drive research, writing, and revision; the same workflow produces training trajectories.</li>
-      <li><b>Strong open agent.</b> Best among compared open agents on 7 of 8 benchmarks.</li>
+      <li><b>State of the art among open agents.</b> On 7 representative multimodal-search and deep-research-agent benchmarks, with traceable textual and visual evidence.</li>
     </ul>
   </section>
 
