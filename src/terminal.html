@@ -1,0 +1,207 @@
+<!-- MIRA-Harness replay: the terminal above the Abstract. tools/build.py scales its px like head.html's and puts it in the
+     #tmTpl template; src/app.js attaches it to #tmHost as a shadow root, so its class names never meet the page's. -->
+<style>
+/* one dark look in both themes; the page's --font-* and --ease reach in through the shadow boundary */
+:host { display: block; color-scheme: dark;
+  --t-bg: #15060A; --t-bg-2: #2C0A11; --t-panel: rgba(255,236,238,.04); --t-line: rgba(255,214,219,.12);
+  --t-fg: #F6E9EB; --t-dim: #BFA2A7; --t-faint: #85656B; --t-red: #FF5B4C; --t-amber: #F4B548; --t-green: #86DBA6;
+  --tk-search: #F3CDD0; --tk-page: #E59AA2; --tk-image: #EC6574; --tk-find: #D24C5D; --tk-python: #BC3D4E; --tk-submit: #FFF3F4;
+  --card-bg: #FFF8F8; --card-ink: #2A0B10; --card-muted: #7A5D62;
+}
+*, *::before, *::after { box-sizing: border-box; }
+/* ---------- the terminal ---------- */
+.term { position: relative; border-radius: 16px; overflow: hidden; color: var(--t-fg); font: 13px/1.6 var(--font-mono);
+  background: radial-gradient(110% 90% at 0% 0%, rgba(218,41,28,.22), transparent 58%), linear-gradient(160deg, var(--t-bg-2) 0%, var(--t-bg) 62%);
+  box-shadow: 0 34px 80px -42px rgba(90,10,20,.7), inset 0 0 0 1px var(--t-line); }
+.bar { display: flex; align-items: center; gap: 12px; padding: 9px 12px 9px 14px; border-bottom: 1px solid var(--t-line); background: rgba(0,0,0,.22); }
+.lights { display: flex; gap: 7px; flex: none; }
+.lights i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57; } .lights i:nth-child(2) { background: #FEBC2E; } .lights i:nth-child(3) { background: #28C840; }
+.bar .name { color: var(--t-dim); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.runs { margin-left: auto; display: flex; gap: 6px; flex: none; }
+.runs button, .bar .again { font: 500 11.5px/1 var(--font-mono); color: var(--t-dim); background: transparent; border: 1px solid var(--t-line); border-radius: 999px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.runs button[aria-pressed="true"] { color: #fff; background: rgba(255,91,76,.22); border-color: rgba(255,91,76,.6); }
+.runs button:hover, .bar .again:hover { color: #fff; border-color: rgba(255,214,219,.35); }
+.runs button:focus-visible, .bar .again:focus-visible { outline: 2px solid var(--t-red); outline-offset: 2px; }
+.bar .again { padding: 6px 9px; }
+
+.screen { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; height: 540px; }   /* long lines clip with an ellipsis instead of widening the card */
+/* welcome box, as in a coding-agent terminal: the mascot, what the harness offers, and the live contract */
+.welcome { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); gap: 20px; align-items: center; margin: 14px 16px 4px; padding: 12px 18px 12px 14px; border: 1px solid rgba(255,91,76,.5); border-radius: 10px; background: var(--t-panel); }
+/* Joy in a handful of blocks: head, ears, eyes, nose, red collar, and the red magnifier; every move is a whole-pixel step */
+.dog { position: relative; width: 102px; height: 66px; --p: 6px; }
+.dog svg { position: absolute; left: 0; bottom: 0; width: 102px; height: 54px; overflow: visible; shape-rendering: crispEdges; }
+.dog .W { fill: #FFFFFF; } .dog .E { fill: #E9C9CE; } .dog .K { fill: #1A0609; } .dog .R { fill: var(--t-red); } .dog .G { fill: #FFD6DA; }
+.dog .all, .dog .head, .dog .ears, .dog .mag { transition: transform .12s steps(1); }
+.dog .eye { animation: blink 4.2s steps(1) infinite; }
+@keyframes blink { 0%, 93% { fill: #1A0609; } 94%, 100% { fill: #FFFFFF; } }
+.dog .all { animation: dog-bob 1.4s steps(1) infinite; }
+@keyframes dog-bob { 50% { transform: translateY(-.5px); } }   /* SVG units: 1px is one block */
+.dog[data-s="sniff"] .head { animation: dog-nod .36s steps(1) infinite; }
+@keyframes dog-nod { 50% { transform: translateY(.5px); } }
+.dog[data-s="read"] .all { animation-duration: .7s; }
+.dog[data-s="look"] .mag { transform: translate(-1px, -1px); }
+.dog[data-s="think"] .ears { animation: dog-ears 1.2s steps(1) infinite; }
+@keyframes dog-ears { 50% { transform: translateY(-.5px); } }
+.dog[data-s="wait"] .all { animation: none; }
+.dog[data-s="warn"] .all { animation: dog-shake .24s steps(1) 4; }
+@keyframes dog-shake { 50% { transform: translateX(-1px); } }
+.dog[data-s="happy"] .all { animation: dog-hop .3s steps(1) 6; }
+.dog[data-s="happy"] .ears { transform: translateY(-1px); }
+@keyframes dog-hop { 50% { transform: translateY(-1.5px); } }
+/* the magnifier grows to show the image the run is inspecting */
+.dog .lens { position: absolute; left: 50px; top: -26px; width: 68px; height: 68px; border-radius: 50%;
+  border: 3px solid var(--t-red); box-shadow: 0 0 0 2px #18060A, 0 10px 24px -8px rgba(0,0,0,.7); background: #fff center / cover no-repeat;
+  transform: scale(.2); opacity: 0; transition: transform .28s var(--ease), opacity .2s linear; pointer-events: none; z-index: 2; }
+.dog .lens.on { transform: scale(1) translate(10px, -4px); opacity: 1; }
+.dog .bubble { position: absolute; left: 30px; top: -14px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 6px; display: grid; place-items: center;
+  font: 600 12px/1 var(--font-mono); color: #1A0609; background: var(--t-fg); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s var(--ease); }
+.dog .bubble.on { opacity: 1; transform: none; }
+.dog .bubble.warn { background: var(--t-amber); } .dog .bubble.ok { background: var(--t-green); }
+.info { min-width: 0; display: grid; gap: 2px; }
+.info .who { font-weight: 600; color: #fff; }
+.info .who span { color: var(--t-faint); font-weight: 400; }
+.info .tools, .info .cmds { color: var(--t-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info .cmds b { color: var(--t-fg); font-weight: 500; }
+.meters { display: grid; gap: 6px; font-size: 11.5px; }
+.meter { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 8px; align-items: center; color: var(--t-dim); }
+.meter .track { position: relative; height: 6px; border-radius: 3px; background: rgba(255,214,219,.12); overflow: hidden; }
+.meter .fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 3px; background: var(--t-fg); transition: width .35s var(--ease), background .3s; }
+.meter .val { font-variant-numeric: tabular-nums; color: var(--t-fg); white-space: nowrap; }
+.meter.met .fill { background: var(--t-green); }
+.meter.bad .fill { background: var(--t-amber); } .meter.bad .val { color: var(--t-amber); }
+.meter .val small { color: var(--t-faint); font-size: inherit; }
+
+/* the log: lines stack from the bottom, older ones fade out at the top */
+.log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 18px 4px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 46px); mask-image: linear-gradient(to bottom, transparent 0, #000 46px); }
+.log > * { flex: none; }   /* rows never shrink; the oldest slide out of view at the top instead */
+.log.fade { opacity: 0; transition: opacity .5s linear; }
+.ln { white-space: pre; overflow: hidden; text-overflow: ellipsis; min-height: 1.6em; animation: ln-in .18s var(--ease) both; }
+@keyframes ln-in { from { opacity: 0; transform: translateY(4px); } }
+.ln.u { white-space: pre-wrap; color: #fff; margin: 6px 0 4px; padding: 6px 10px; border-left: 2px solid var(--t-red); background: rgba(255,91,76,.08); border-radius: 0 6px 6px 0; }
+.ln.u .cmd { color: var(--t-red); font-weight: 600; }
+.ln .el { color: var(--t-faint); }
+.ln.sys, .ln.res, .ln.fold { color: var(--t-dim); padding-left: 2ch; }
+.ln.think { color: var(--t-faint); font-style: italic; margin-top: 4px; }
+.ln.think .star { color: var(--t-red); font-style: normal; }
+.ln.call .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 1.1ch 1px .2ch; background: var(--c); vertical-align: middle; }
+.ln.call b { font-weight: 600; color: #fff; }
+.ln.call .arg { color: var(--t-fg); }
+.ln.call .str { color: #FFD9DC; }
+.ln.res.err { color: #FF9A8F; }
+.ln.res img { display: inline-block; width: 36px; height: 24px; object-fit: cover; border-radius: 3px; vertical-align: -7px; margin-right: 8px; box-shadow: 0 0 0 1px rgba(255,255,255,.25); }
+.ln.fold .n { color: var(--t-fg); font-variant-numeric: tabular-nums; }
+.gate { white-space: normal; margin: 6px 0 6px 2ch; padding: 8px 12px 9px; border-radius: 8px; border: 1px solid; animation: ln-in .25s var(--ease) both; }
+.gate.warn { border-color: rgba(244,181,72,.55); background: rgba(244,181,72,.07); }
+.gate.ok { border-color: rgba(134,219,166,.5); background: rgba(134,219,166,.07); }
+.gate .head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.gate .tag { font-weight: 600; letter-spacing: .04em; }
+.gate.warn .tag { color: var(--t-amber); } .gate.ok .tag { color: var(--t-green); }
+.gate .checks { color: var(--t-dim); }
+.gate .checks .x { color: var(--t-amber); } .gate .checks .v { color: var(--t-green); }
+.gate ul { list-style: none; margin: 5px 0 0; padding: 0; display: grid; gap: 1px; }
+.gate li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gate li code { color: var(--t-amber); font: inherit; }
+.gate .fix { color: var(--t-fg); white-space: normal; margin-top: 4px; }
+.gate .fix::before { content: "→ "; color: var(--t-faint); }
+.ln.done { color: var(--t-green); margin-top: 4px; }
+
+/* slash-command menu and input box */
+.menu { position: absolute; left: 16px; right: 16px; bottom: 82px; z-index: 3; border: 1px solid var(--t-line); border-radius: 8px; background: #1F080D; padding: 6px; display: grid; gap: 2px;
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,.8); opacity: 0; transform: translateY(6px); transition: opacity .15s, transform .15s var(--ease); pointer-events: none; }
+.menu.on { opacity: 1; transform: none; }
+.menu .it { display: grid; grid-template-columns: 17ch minmax(0, 1fr); gap: 14px; padding: 5px 10px; border-radius: 5px; color: var(--t-dim); white-space: nowrap; }
+.menu .it b { color: var(--t-fg); font-weight: 500; }
+.menu .it span { overflow: hidden; text-overflow: ellipsis; }
+.menu .it.hi { background: rgba(255,91,76,.18); color: var(--t-fg); }
+.menu .it.hi b { color: #fff; }
+.prompt { margin: 8px 16px 0; padding: 9px 12px; border: 1px solid var(--t-line); border-radius: 9px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; background: rgba(0,0,0,.18); }
+.prompt .chev { color: var(--t-red); font-weight: 600; }
+.prompt .text { white-space: pre-wrap; max-height: 3.2em; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 1.6em; }
+.prompt .text .ph { color: var(--t-faint); }
+.prompt .text .cmd { color: var(--t-red); font-weight: 600; }
+.prompt .text .paste { background: rgba(255,214,219,.14); border-radius: 3px; transition: background 1s; }
+.prompt .text .paste.settled { background: transparent; }
+.caret { display: inline-block; width: .6em; height: 1.15em; vertical-align: -.2em; background: var(--t-fg); animation: blink 1s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.status { display: flex; justify-content: space-between; gap: 16px; padding: 7px 18px 12px; font-size: 12px; color: var(--t-dim); }
+.status .l { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status .spin { color: var(--t-red); display: inline-block; width: 1.4ch; }
+.status .verb { color: var(--t-fg); }
+.status .r { flex: none; color: var(--t-faint); }
+.status .paused { color: var(--t-amber); }
+
+/* the report pops out when the gate says OK */
+.report { position: absolute; z-index: 4; right: 20px; bottom: 92px; width: min(420px, calc(100% - 40px)); padding: 14px 16px 14px; border-radius: 12px; background: var(--card-bg); color: var(--card-ink);
+  font: 14px/1.45 var(--font-body); box-shadow: 0 30px 60px -24px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.4);
+  opacity: 0; transform: translateY(18px) scale(.96); transform-origin: 80% 100%; transition: opacity .3s linear, transform .45s var(--ease); pointer-events: none; }
+.report.on { opacity: 1; transform: none; }
+.report .top { display: flex; align-items: center; gap: 10px; font: 500 12px/1 var(--font-mono); color: var(--card-muted); }
+.report .file { width: 18px; height: 22px; border-radius: 2px 7px 2px 2px; background: linear-gradient(225deg, transparent 6px, #DA291C 0); flex: none; }
+.report .top b { color: var(--card-ink); font-weight: 600; }
+.report .pill { margin-left: auto; padding: 3px 8px; border-radius: 999px; background: #DA291C; color: #fff; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.report h3 { margin: 10px 0 4px; font: 600 1.02rem/1.3 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+.report .stats { color: var(--card-muted); font: 12px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; }
+.report .figs { display: flex; gap: 6px; margin-top: 10px; overflow: hidden; }
+.report .figs img { width: 62px; height: 44px; object-fit: cover; border-radius: 4px; flex: none; box-shadow: 0 0 0 1px rgba(42,11,16,.12); }
+.report .figs .more { flex: none; width: 44px; height: 44px; border-radius: 4px; display: grid; place-items: center; background: #F3E4E6; color: var(--card-muted); font: 600 12px var(--font-mono); }
+.report .seal { margin-top: 9px; color: var(--card-muted); font: 11.5px/1.3 var(--font-mono); }
+.report .seal b { color: #1F8A4C; font-weight: 600; }
+
+@media (max-width: 860px) {
+  .welcome { grid-template-columns: auto minmax(0, 1fr); gap: 10px 16px; }
+  .meters { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .meter { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab val" "bar bar"; gap: 3px 6px; }
+  .meter .lab { grid-area: lab; } .meter .track { grid-area: bar; } .meter .val { grid-area: val; }
+}
+@media (max-width: 600px) {
+  .term { font-size: 11.5px; border-radius: 12px; }
+  .screen { height: 600px; }
+  .bar .name { display: none; }
+  .runs button .t { display: none; }
+  .welcome { margin: 10px 10px 4px; padding: 10px 12px; }
+  .dog { width: 85px; height: 56px; }
+  .dog svg { width: 85px; height: 45px; }
+  .dog .lens { left: 40px; top: -22px; width: 56px; height: 56px; }
+  .info .tools { white-space: normal; }
+  .meters { grid-template-columns: 1fr; gap: 6px; }
+  .meter { grid-template-columns: 9ch minmax(0, 1fr) auto; grid-template-areas: none; gap: 8px; }
+  .meter .lab, .meter .track, .meter .val { grid-area: auto; }
+  .log { padding: 0 12px 4px; }
+  .prompt { margin: 6px 10px 0; }
+  .menu { left: 10px; right: 10px; bottom: 76px; }
+  .menu .it { grid-template-columns: 1fr; gap: 0; }
+  .status { padding: 6px 12px 10px; }
+  .status .r { display: none; }
+  .report { right: 10px; width: calc(100% - 20px); bottom: 84px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+  <div class="term" id="term" aria-label="Replay of two recorded MIRA-Harness runs">
+    <div class="bar">
+      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="name">mira — MIRA-Harness — recorded runs</span>
+      <div class="runs" id="runs" role="group" aria-label="Run"></div>
+      <button type="button" class="again" id="again" aria-label="Replay this run" title="Replay this run">&#8635;</button>
+    </div>
+    <div class="screen">
+      <div class="welcome">
+        <div class="dog" id="dog" data-s="idle" role="img" aria-label="Joy, the MIRA mascot, holding a magnifier"><i class="lens" id="lens"></i><span class="bubble" id="bubble"></span></div>
+        <div class="info">
+          <div class="who">MIRA-Harness <span>· replay</span></div>
+          <div class="tools">search · open · find · Python &nbsp;→&nbsp; submit_report &nbsp;→&nbsp; report gate</div>
+          <div class="cmds"><b>/concisereport</b> · <b>/detailreport</b></div>
+        </div>
+        <div class="meters" id="meters">
+          <div class="meter" data-m="chars"><span class="lab">length</span><span class="track"><i class="fill"></i></span><span class="val">–</span></div>
+          <div class="meter" data-m="images"><span class="lab">images</span><span class="track"><i class="fill"></i></span><span class="val">0</span></div>
+          <div class="meter" data-m="sources"><span class="lab">sources</span><span class="track"><i class="fill"></i></span><span class="val">0</span></div>
+        </div>
+      </div>
+      <div class="log" id="log"></div>
+      <div class="prompt"><span class="chev">›</span><div class="text" id="ptext"></div></div>
+      <div class="status"><span class="l" id="stl"></span><span class="r" id="str">replay of a recorded run · time compressed</span></div>
+      <div class="menu" id="menu"></div>
+      <div class="report" id="report"></div>
+    </div>
+  </div>

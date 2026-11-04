@@ -129,7 +129,12 @@ for c in CASES:
     print(c['id'], t['runs'], {m: (report[m]['images'], report[m]['refs']) for m in MODES}, file=sys.stderr)
 
 # ---------- assemble ----------
-data = {'table': table, 'chart': {'benchmarks': benchmarks, 'series': series}, 'steps': steps, 'cases': cases}
+# the terminal above the Abstract replays two recorded runs; tools/terminal2json.py wrote this from their trajectories
+terminal = json.load(open(os.path.join(DATA, 'terminal.json'), encoding='utf-8'))
+for r in terminal.values():
+    for p in r['thumbs'].values():
+        assert os.path.exists(os.path.join(ROOT, p)), p
+data = {'table': table, 'chart': {'benchmarks': benchmarks, 'series': series}, 'steps': steps, 'cases': cases, 'terminal': terminal}
 js = open(os.path.join(SRC, 'app.js'), encoding='utf-8').read().replace('{{DATA}}', json.dumps(data, ensure_ascii=False))
 assert '</script' not in js
 body = open(os.path.join(SRC, 'body.html'), encoding='utf-8').read()
@@ -157,6 +162,11 @@ def scale_block(m):
 a, b = head.index('<style>'), head.index('</style>')
 assert head.count('<style>') == 1 and head[a:b].count('{') == head[a:b].count('}')
 head = head[:a] + re.sub(r'\{[^{}]*\}', scale_block, head[a:b]) + head[b:]
+# the terminal's own stylesheet gets the same scale; app.js moves the template into a shadow root, which --k reaches by inheritance
+term = open(os.path.join(SRC, 'terminal.html'), encoding='utf-8').read()
+a, b = term.index('<style>'), term.index('</style>')
+assert term.count('<style>') == 1 and term[a:b].count('{') == term[a:b].count('}') and body.count('<!-- terminal -->') == 1
+body = body.replace('<!-- terminal -->', term[:a] + re.sub(r'\{[^{}]*\}', scale_block, term[a:b]) + term[b:])
 for name in sorted(os.listdir(os.path.join(ASSETS, 'img'))):      # the mascot's mask layers travel inside the stylesheet
     if name.startswith('wm_') and name.endswith('.png'):
         ref = 'url("assets/img/%s")' % name

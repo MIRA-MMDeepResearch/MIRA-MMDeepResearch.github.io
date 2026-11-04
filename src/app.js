@@ -54,6 +54,281 @@ function attract() {
   [0, 1600, 3200].forEach((t, k) => setTimeout(() => { if (document.hidden) return; wagOnce(); if (k === 2) wmHint.classList.add('pulse'); }, t));
 }
 
+/* ---------- harness replay: the terminal above the Abstract replays two recorded runs (DATA.terminal, from tools/terminal2json.py).
+   It lives in a shadow root built from #tmTpl, so its styles and class names stay apart from the page's ---------- */
+(function () {
+  const host = $('#tmHost'), tpl = $('#tmTpl');
+  if (!host || !tpl || !DATA.terminal) return;
+  const root = host.attachShadow({ mode: 'open' });
+  root.append(tpl.content.cloneNode(true));
+  const RUNS = DATA.terminal;
+  const ORDER = [['concrete', 'Roman concrete'], ['traffic', 'Traffic flow']];
+  const q = (s, r = root) => r.querySelector(s);
+  const term = q('#term'), log = q('#log'), ptext = q('#ptext'), menu = q('#menu'), stl = q('#stl'), str = q('#str'), dog = q('#dog'), lens = q('#lens'), bubble = q('#bubble'), report = q('#report');
+  const narrow = () => innerWidth <= 600;
+  const COLORS = { search: 'var(--tk-search)', page: 'var(--tk-page)', image: 'var(--tk-image)', find: 'var(--tk-find)', python: 'var(--tk-python)', submit: 'var(--tk-submit)' };
+  const VERBS = { search: 'Sniffing the web', page: 'Reading', image: 'Squinting at pixels', find: 'Finding', python: 'Running Python', submit: 'Waiting on the report gate' };
+  const COMMANDS = [['/concisereport', '300–2,000 chars · ≥2 images · ≥2 sources'], ['/detailreport', '5,000–10,000 chars · ≥10 images · ≥8 sources']];
+  const fmt = n => n.toLocaleString('en-US');
+  const clock = s => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  /* ---------- time: every wait honours pause and is cut short when a new run starts ---------- */
+  const SPEED = Math.max(.25, Math.min(8, +new URLSearchParams(location.search).get('speed') || 1));   // ?speed=4 for a quick look
+  let token = 0, paused = { away: true, hidden: document.hidden }, instant = false;   // it plays only while on screen
+  const isPaused = () => paused.away || paused.hidden;
+  class Stop extends Error {}
+  function step(ms, my) {
+    if (instant) return Promise.resolve();
+    return new Promise((res, rej) => {
+      let left = ms / SPEED, last = performance.now();
+      const tick = () => {
+        if (my !== token) return rej(new Stop());
+        const now = performance.now(); if (!isPaused()) left -= now - last; last = now;
+        if (left <= 0) res(); else setTimeout(tick, Math.min(40, left));
+      };
+      setTimeout(tick, Math.min(40, ms));
+    });
+  }
+
+  /* ---------- status line: spinner, verb, turn, calls, recorded clock ---------- */
+  const FRAMES = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
+  let frame = 0, st = { verb: '', turn: 0, turns: 0, calls: 0, secs: 0, done: false };
+  function drawStatus() {
+    stl.textContent = '';
+    if (!st.verb) return;
+    const spin = el('span', 'spin', st.done ? '✓' : FRAMES[frame % FRAMES.length]);
+    stl.append(spin, ' ', el('span', 'verb', st.verb + (st.done ? '' : '…')));
+    if (st.turns) stl.append(` · turn ${st.turn}/${st.turns} · ${st.calls} calls · ${clock(st.secs)}`);
+  }
+  setInterval(() => { if (!isPaused() && !st.done) { frame++; drawStatus(); } }, 90);
+
+  /* ---------- the dog: 17 × 9 blocks, drawn as rectangles [x, y, w, h, colour] ---------- */
+  const JOY = {
+    ears: [[1, 1, 2, 4, 'E'], [10, 1, 2, 4, 'E']],   // floppy: they hang below the eyes
+    head: [[3, 0, 7, 5, 'W'], [4, 2, 1, 1, 'K eye'], [8, 2, 1, 1, 'K eye'], [6, 3, 1, 1, 'K']],
+    body: [[3, 5, 7, 1, 'R'], [3, 6, 7, 2, 'W'], [3, 8, 2, 1, 'W'], [8, 8, 2, 1, 'W'], [10, 5, 2, 1, 'W']],
+    mag: [[14, 0, 2, 1, 'R'], [13, 1, 1, 2, 'R'], [16, 1, 1, 2, 'R'], [14, 3, 2, 1, 'R'], [14, 1, 2, 2, 'G'], [13, 4, 1, 1, 'R'], [12, 5, 1, 1, 'R']],
+  };
+  (() => {
+    const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), all = document.createElementNS(NS, 'g');
+    svg.setAttribute('viewBox', '0 0 17 9'); svg.setAttribute('aria-hidden', 'true'); all.setAttribute('class', 'all');
+    for (const [part, rects] of Object.entries(JOY)) {
+      const g = document.createElementNS(NS, 'g'); g.setAttribute('class', part);
+      rects.forEach(([x, y, w, h, c]) => { const r = document.createElementNS(NS, 'rect'); Object.entries({ x, y, width: w, height: h, class: c }).forEach(([k, v]) => r.setAttribute(k, v)); g.append(r); });
+      all.append(g);
+    }
+    svg.append(all); dog.prepend(svg);
+    const size = () => {   // whole-pixel blocks: 6px, or 5px on a phone and on a desktop scaled by --k (inline, so build.py leaves it alone)
+      const k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--k')) || 1, b = innerWidth <= 600 ? 5 : Math.max(4, Math.round(6 * k));
+      Object.assign(svg.style, { width: 17 * b + 'px', height: 9 * b + 'px' }); Object.assign(dog.style, { width: 17 * b + 'px', height: 11 * b + 'px' });
+    };
+    size(); addEventListener('resize', size);
+  })();
+  let lensT = null;
+  function mood(s, say, kind) {
+    dog.dataset.s = s;
+    bubble.className = 'bubble' + (say ? ' on' : '') + (kind ? ' ' + kind : '');
+    bubble.textContent = say || '';
+  }
+  function peek(src) {
+    clearTimeout(lensT);
+    lens.style.backgroundImage = `url("${src}")`; lens.classList.add('on');
+    lensT = setTimeout(() => lens.classList.remove('on'), instant ? 0 : 900);
+  }
+
+  /* ---------- contract meters ---------- */
+  const meter = k => q(`.meter[data-m="${k}"]`);
+  function setMeter(k, frac, val, state) {
+    const m = meter(k);
+    q('.fill', m).style.width = Math.max(0, Math.min(1, frac)) * 100 + '%';
+    q('.val', m).innerHTML = val;
+    m.classList.toggle('met', state === 'met'); m.classList.toggle('bad', state === 'bad');
+  }
+  function resetMeters(c) {
+    setMeter('chars', 0, `– <small>/ ${fmt(c.min_chars)}–${fmt(c.max_chars)}</small>`);
+    setMeter('images', 0, `0 <small>/ ≥${c.min_images}</small>`);
+    setMeter('sources', 0, `0 <small>/ ≥${c.min_sources}</small>`);
+  }
+
+  /* ---------- log lines ---------- */
+  function line(cls, ...parts) { const e = el('div', 'ln ' + cls); e.append(...parts); log.append(e); while (log.children.length > 90) log.firstChild.remove(); return e; }
+  const elbow = () => el('span', 'el', '⎿ ');
+  function callLine(c) {
+    const e = line('call');
+    const dot = el('i', 'dot'); dot.style.setProperty('--c', COLORS[c.k]);
+    const name = c.k === 'search' ? 'search' : c.k === 'submit' ? 'submit_report' : c.k === 'find' ? 'find' : c.k === 'python' ? 'PythonInterpreter' : 'open';
+    const arg = c.k === 'search' ? el('span', 'str', `"${c.a}"`) : el('span', 'arg', c.k === 'image' ? 'id=' + c.a : c.a);
+    e.append(dot, el('b', null, name), '(', arg, ')');
+    return e;
+  }
+  function resultLine(c, run) {
+    const e = line('res' + (c.err ? ' err' : ''), elbow());
+    if (c.img && run.thumbs[c.img]) { const i = el('img'); i.src = run.thumbs[c.img]; i.alt = ''; e.append(i); }
+    e.append(c.o);
+    return e;
+  }
+
+  /* ---------- typing the request ---------- */
+  function renderPrompt(cmd, typed, pasted, caret, busy) {
+    ptext.textContent = '';
+    const row = el('div');
+    if (!cmd && !typed) row.append(el('span', 'ph', busy ? 'MIRA is working · a replay of the recorded run' : 'Ask MIRA to research anything · type / for report modes'));
+    if (cmd) row.append(el('span', 'cmd', cmd));
+    if (typed) row.append(typed);
+    if (pasted) row.append(el('span', 'paste', pasted));
+    if (caret) row.append(el('span', 'caret'));
+    ptext.append(row);
+  }
+  function showMenu(filter) {
+    menu.textContent = '';
+    COMMANDS.forEach(([c, d]) => { const it = el('div', 'it' + (filter && c.startsWith(filter) ? ' hi' : '')); it.append(el('b', null, c), el('span', null, d)); menu.append(it); });
+    menu.classList.add('on');
+  }
+  async function typeRequest(run, my) {
+    renderPrompt('', '', '', true); await step(900, my);
+    const target = run.cmd, key = target.slice(0, 4);   // "/con" or "/det" is enough to pick the command
+    for (let i = 1; i <= key.length; i++) { renderPrompt('', target.slice(0, i), '', true); showMenu(target.slice(0, i)); await step(i === 1 ? 650 : 130, my); }
+    await step(450, my);
+    menu.classList.remove('on'); renderPrompt(target + ' ', '', '', true); await step(350, my);
+    const head = run.q.slice(0, narrow() ? 38 : 64), rest = run.q.slice(head.length);
+    for (let i = 1; i <= head.length; i++) { renderPrompt(target + ' ', head.slice(0, i), '', true); await step(26, my); }
+    await step(260, my);
+    renderPrompt(target + ' ', head, rest, true);   // the rest of the request arrives as a paste
+    requestAnimationFrame(() => q('.paste', ptext)?.classList.add('settled'));
+    await step(900, my);
+    renderPrompt('', '', '', false, true);
+  }
+
+  /* ---------- gate box ---------- */
+  const ISSUE = { reference_unreachable: 'reference unreachable', unexamined_image: 'cited image never opened', nonlocal_or_missing_destination: 'image path not from the run', missing_required_source: 'required source missing' };
+  function gateBox(c, run) {
+    const k = c.checks, ok = c.ok, box = el('div', 'gate ' + (ok ? 'ok' : 'warn'));
+    const head = el('div', 'head');
+    head.append(el('span', 'tag', ok ? 'OK' : 'WARN'), el('span', null, `report gate · ${c.a}`));
+    const checks = el('span', 'checks');
+    const lenOk = k.chars >= run.contract.min_chars && k.chars <= run.contract.max_chars;
+    const imgBad = c.issues.some(i => i.code === 'unexamined_image' || i.code === 'nonlocal_or_missing_destination');
+    const refBad = k.accessible_references < k.opened_sources_cited;
+    const mark = good => el('span', good ? 'v' : 'x', good ? ' ✓' : ' ✗');
+    checks.append(`chars ${fmt(k.chars)}`, mark(lenOk), ` · images ${k.examined_images_cited}`, mark(!imgBad && k.examined_images_cited >= run.contract.min_images),
+      ` · sources ${k.opened_sources_cited}`, mark(k.opened_sources_cited >= run.contract.min_sources), ` · reachable ${k.accessible_references}/${k.opened_sources_cited}`, mark(!refBad));
+    head.append(checks);
+    box.append(head);
+    if (!ok) {
+      const ul = el('ul');
+      c.issues.forEach(i => {
+        const li = el('li'); li.append(el('code', null, `${ISSUE[i.code] || i.code} ×${i.n}`), '  ' + i.items.map(x => x.t + (x.x ? ' ' + x.x : '')).join(' · '));
+        ul.append(li);
+      });
+      box.append(ul, el('div', 'fix', (c.issues[0] && c.issues[0].fix.split('. ')[0].replace(/\.$/, '')) + `. Repairs left: ${c.left}.`));
+    } else {
+      box.append(el('div', 'checks', `published unchanged · sha256 ${c.sha}…`));
+    }
+    const wrap = el('div', 'ln'); wrap.style.whiteSpace = 'normal'; wrap.append(box); log.append(wrap);
+    return { lenOk, imgBad, refBad };
+  }
+
+  /* ---------- the report card ---------- */
+  function showReport(run) {
+    const f = run.final;
+    report.textContent = '';
+    const top = el('div', 'top'); top.append(el('i', 'file'), el('b', null, 'report.md'), el('span', null, 'accepted draft'), el('span', 'pill', run.mode));
+    const figs = el('div', 'figs'), max = narrow() ? 4 : 5;
+    run.cited.slice(0, max).forEach(h => { const i = el('img'); i.src = run.thumbs[h]; i.alt = ''; figs.append(i); });
+    if (run.cited.length > max) figs.append(el('span', 'more', '+' + (run.cited.length - max)));
+    const turns = run.turns.length;
+    report.append(top, el('h3', null, run.title),
+      el('div', 'stats', `${fmt(f.chars)} chars · ${f.examined_images_cited} images · ${f.opened_sources_cited} sources · ${turns} turns · ${run.calls} calls · ${clock(run.secs)}`), figs);
+    const seal = el('div', 'seal'); seal.append(el('b', null, '✓ report gate OK'), ' · the delivered file is the accepted draft, unchanged'); report.append(seal);
+    report.classList.add('on');
+  }
+
+  /* ---------- one run ---------- */
+  async function play(key, my) {
+    const run = RUNS[key], c = run.contract;
+    Object.values(run.thumbs).forEach(src => { new Image().src = src; });   // the lens and the card should not wait for them
+    ORDER.forEach(([k], i) => runsBox.children[i].setAttribute('aria-pressed', String(k === key)));
+    log.classList.remove('fade'); log.textContent = ''; report.classList.remove('on'); menu.classList.remove('on');
+    resetMeters(c); mood('idle');
+    st = { verb: 'Ready', turn: 0, turns: 0, calls: 0, secs: 0, done: false }; drawStatus();
+    await typeRequest(run, my);
+    const u = line('u'); u.append(el('span', 'cmd', run.cmd), ' ' + run.q);
+    line('sys', elbow(), `contract · ${fmt(c.min_chars)}–${fmt(c.max_chars)} chars · ≥${c.min_images} inspected images · ≥${c.min_sources} opened sources · ${run.repairs} repairs allowed`);
+    const imgs = new Set(), pages = new Set();
+    const show = narrow() ? 2 : 3;
+    st.turns = run.turns.length;
+    for (let t = 0; t < run.turns.length; t++) {
+      const turn = run.turns[t], perCall = turn.calls.length ? (turn.secs - turn.think) / turn.calls.length : 0;
+      st.turn = t + 1; st.verb = 'Thinking'; mood('think'); drawStatus();
+      const th = line('think'); th.append(el('span', 'star', '✻ '), `Thought for ${turn.think}s`);
+      st.secs += turn.think; await step(420, my);
+      let fold = null, folded = { n: 0, kinds: {}, imgs: 0, errs: 0 };
+      for (let i = 0; i < turn.calls.length; i++) {
+        const call = turn.calls[i];
+        st.calls++; st.secs += perCall; st.verb = VERBS[call.k];
+        mood(call.k === 'search' ? 'sniff' : call.k === 'image' ? 'look' : call.k === 'submit' ? 'wait' : 'read', call.k === 'submit' ? '?' : '');
+        if (call.k === 'image') { imgs.add(call.a); if (call.img) peek(run.thumbs[call.img]); }
+        if (call.k === 'page' && !call.err) pages.add(call.a.replace(/, loc=\d+$/, ''));
+        setMeter('images', imgs.size / c.min_images, `${imgs.size} <small>/ ≥${c.min_images}</small>`, imgs.size >= c.min_images ? 'met' : '');
+        setMeter('sources', pages.size / c.min_sources, `${pages.size} <small>/ ≥${c.min_sources}</small>`, pages.size >= c.min_sources ? 'met' : '');
+        drawStatus();
+        if (call.k === 'submit') {
+          const k = call.checks;
+          const e = callLine(call); e.querySelector('.arg').textContent = `${call.a} · ${fmt(k.chars)} chars · ${k.examined_images_cited} images · ${k.opened_sources_cited} sources`;
+          const span = c.max_chars - c.min_chars;
+          setMeter('chars', (k.chars - c.min_chars) / span, `${fmt(k.chars)} <small>/ ${fmt(c.min_chars)}–${fmt(c.max_chars)}</small>`, k.chars >= c.min_chars && k.chars <= c.max_chars ? 'met' : 'bad');
+          await step(1100, my);
+          const res = gateBox(call, run);
+          setMeter('images', k.examined_images_cited / c.min_images, `${k.examined_images_cited} cited <small>/ ≥${c.min_images}</small>`, res.imgBad ? 'bad' : 'met');
+          setMeter('sources', k.accessible_references / c.min_sources, `${k.accessible_references}/${k.opened_sources_cited} reachable <small>/ ≥${c.min_sources}</small>`, res.refBad ? 'bad' : 'met');
+          if (call.ok) { st.verb = 'Writing report.md'; mood('happy', '✓', 'ok'); drawStatus(); await step(1500, my); }
+          else { st.verb = 'Fixing what the gate flagged'; mood('warn', '!', 'warn'); drawStatus(); await step(3200, my); mood('think'); }
+          continue;
+        }
+        if (i < show || turn.calls.length <= show + 1) {
+          callLine(call); await step(call.k === 'image' ? 260 : 200, my);
+          resultLine(call, run); await step(call.k === 'image' ? 420 : 240, my);
+        } else {
+          folded.n++; folded.kinds[call.k] = (folded.kinds[call.k] || 0) + 1; if (call.k === 'image') folded.imgs++; if (call.err) folded.errs++;
+          if (!fold) fold = line('fold');
+          const what = Object.entries(folded.kinds).map(([k, n]) => `${k === 'image' ? 'open(id=…)' : k === 'page' ? 'open' : k} ×${n}`).join(', ');
+          fold.textContent = ''; fold.append(el('span', 'el', '⋯ '), el('span', 'n', `${folded.n} more`), ` · ${what}` + (folded.imgs ? ` · ${folded.imgs} image${folded.imgs > 1 ? 's' : ''} inspected` : '') + (folded.errs ? ` · ${folded.errs} tool error${folded.errs > 1 ? 's' : ''}` : ''));
+          await step(call.k === 'image' ? 230 : 90, my);
+        }
+      }
+    }
+    st.verb = 'Done'; st.done = true; drawStatus();
+    line('done', `✓ report.md delivered · ${fmt(run.final.chars)} chars · ${run.final.examined_images_cited} images · ${run.final.opened_sources_cited} sources · ${run.turns.length} turns · ${run.calls} calls · ${clock(run.secs)} recorded`);
+    mood('happy', '✓', 'ok');
+    showReport(run);
+    await step(5200, my);
+    report.classList.remove('on'); log.classList.add('fade'); mood('idle');
+    await step(700, my);
+  }
+
+  /* ---------- loop, run buttons, pausing ---------- */
+  const runsBox = q('#runs');
+  ORDER.forEach(([k, label], i) => {
+    const b = el('button'); b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+    b.append(String(i + 1), el('span', 't', ` ${label} · ${RUNS[k].cmd}`));
+    b.addEventListener('click', () => start(i)); runsBox.append(b);
+  });
+  let cur = 0;
+  async function start(i) {
+    const my = ++token; cur = i;
+    try { for (;;) { await play(ORDER[cur][0], my); cur = (cur + 1) % ORDER.length; } } catch (e) { if (!(e instanceof Stop)) throw e; }
+  }
+  q('#again').addEventListener('click', () => start(cur));
+  document.addEventListener('visibilitychange', () => { paused.hidden = document.hidden; });
+  new IntersectionObserver(([en]) => { paused.away = !en.isIntersecting; }, { threshold: .25 }).observe(term);
+
+  if (reduce) {   // no motion: the first run, complete and still
+    instant = true; paused.away = false;
+    play(ORDER[0][0], token).then(() => { report.classList.add('on'); log.classList.remove('fade'); st.verb = 'Done'; drawStatus(); });
+  } else start(0);
+})();
+
 /* ---------- top bar, side rail, section tracking ---------- */
 const topbar = $('#topbar'), secnav = $('#secnav'), railTrack = $('#railTrack'), railFill = $('#railFill');
 const navLinks = $$('#topbar nav a'), railLinks = $$('#secnav ol a');
