@@ -229,6 +229,33 @@ function attract() {
     return { lenOk, imgBad, refBad };
   }
 
+  /* ---------- the evidence column (desktop): every page the run opened and every image it inspected, marked by the gate ---------- */
+  const evImgs = q('#evImgs'), evSrc = q('#evSrc'), evN = q('#evN'), ev = { pages: new Map(), opened: 0, imgs: 0, tiles: new Map() };
+  function evCount() { evN.textContent = ''; evN.append(el('b', null, String(ev.opened)), ' pages · ', el('b', null, String(ev.imgs)), ' images'); }
+  function evReset() { evImgs.textContent = ''; evSrc.textContent = ''; ev.pages.clear(); ev.tiles.clear(); ev.opened = ev.imgs = 0; evCount(); }
+  function evImage(call, run) {
+    let t = ev.tiles.get(call.a);
+    if (t && !t.classList.contains('want')) return;   // the same image opened twice
+    if (!t) { t = el('i'); evImgs.append(t); ev.tiles.set(call.a, t); }
+    t.className = ''; if (call.img) t.style.backgroundImage = `url("${run.thumbs[call.img]}")`;
+    ev.imgs++; evCount();
+    while (evImgs.children.length > 15) { const old = evImgs.firstChild; ev.tiles.forEach((v, k) => { if (v === old) ev.tiles.delete(k); }); old.remove(); }
+  }
+  function evPage(call) {
+    const url = call.a.replace(/, loc=\d+$/, '');
+    if (ev.pages.has(url)) return;
+    const li = el('li', call.err ? 'err' : null); li.append(el('span', null, url), el('span', 'm', call.err ? 'error' : 'opened'));
+    evSrc.prepend(li); ev.pages.set(url, li);   // newest first
+    while (evSrc.children.length > 40) evSrc.lastChild.remove();
+    if (!call.err) { ev.opened++; evCount(); }
+  }
+  function evGate(call) {
+    call.issues.forEach(i => i.items.forEach(x => {
+      if (i.code === 'reference_unreachable') ev.pages.forEach((li, url) => { if (url.split('/')[0] === x.t) { li.className = 'bad'; li.lastChild.textContent = x.x || 'unreachable'; } });
+      if (i.code === 'unexamined_image' && !ev.tiles.has(x.t)) { const t = el('i', 'want'); t.title = x.t; evImgs.append(t); ev.tiles.set(x.t, t); }
+    }));
+  }
+
   /* ---------- the report card: it links to the same report in the case study, and a pointer glides in to say so ---------- */
   let cardHeld = false;
   report.addEventListener('click', e => { e.preventDefault(); openCaseReport(report.dataset.case, report.dataset.mode); });
@@ -261,7 +288,7 @@ function attract() {
     Object.values(run.thumbs).forEach(src => { new Image().src = src; });   // the lens and the card should not wait for them
     ORDER.forEach(([k], i) => runsBox.children[i].setAttribute('aria-pressed', String(k === key)));
     log.classList.remove('fade'); log.textContent = ''; report.classList.remove('on'); menu.classList.remove('on');
-    resetMeters(c); mood('idle');
+    resetMeters(c); evReset(); mood('idle');
     st = { verb: 'Ready', turn: 0, turns: 0, calls: 0, secs: 0, done: false }; drawStatus();
     await typeRequest(run, my);
     const u = line('u'); u.append(el('span', 'cmd', run.cmd), ' ' + run.q);
@@ -279,8 +306,8 @@ function attract() {
         const call = turn.calls[i];
         st.calls++; st.secs += perCall; st.verb = VERBS[call.k];
         mood(call.k === 'search' ? 'sniff' : call.k === 'image' ? 'look' : call.k === 'submit' ? 'wait' : 'read', call.k === 'submit' ? '?' : '');
-        if (call.k === 'image') { imgs.add(call.a); if (call.img) peek(run.thumbs[call.img]); }
-        if (call.k === 'page' && !call.err) pages.add(call.a.replace(/, loc=\d+$/, ''));
+        if (call.k === 'image') { imgs.add(call.a); evImage(call, run); if (call.img) peek(run.thumbs[call.img]); }
+        if (call.k === 'page') { evPage(call); if (!call.err) pages.add(call.a.replace(/, loc=\d+$/, '')); }
         setMeter('images', imgs.size / c.min_images, `${imgs.size} <small>/ ≥${c.min_images}</small>`, imgs.size >= c.min_images ? 'met' : '');
         setMeter('sources', pages.size / c.min_sources, `${pages.size} <small>/ ≥${c.min_sources}</small>`, pages.size >= c.min_sources ? 'met' : '');
         drawStatus();
@@ -290,7 +317,7 @@ function attract() {
           const span = c.max_chars - c.min_chars;
           setMeter('chars', (k.chars - c.min_chars) / span, `${fmt(k.chars)} <small>/ ${fmt(c.min_chars)}–${fmt(c.max_chars)}</small>`, k.chars >= c.min_chars && k.chars <= c.max_chars ? 'met' : 'bad');
           await step(1100, my);
-          const res = gateBox(call, run);
+          const res = gateBox(call, run); evGate(call);
           setMeter('images', k.examined_images_cited / c.min_images, `${k.examined_images_cited} cited <small>/ ≥${c.min_images}</small>`, res.imgBad ? 'bad' : 'met');
           setMeter('sources', k.accessible_references / c.min_sources, `${k.accessible_references}/${k.opened_sources_cited} reachable <small>/ ≥${c.min_sources}</small>`, res.refBad ? 'bad' : 'met');
           if (call.ok) { st.verb = 'Writing report.md'; mood('happy', '✓', 'ok'); drawStatus(); await step(1500, my); }
