@@ -32,15 +32,14 @@
   <button class="wm" id="wm" type="button" aria-label="MIRA mascot: click for a trick"><span class="wm-l dog"><span class="wm-s"></span></span><span class="wm-l wc c1"><span class="wm-s"></span></span><span class="wm-l wc c2"><span class="wm-s"></span></span><span class="wm-l wc c3"><span class="wm-s"></span></span><span class="wm-l dots"><span class="wm-s"></span></span></button>
   <span class="wm-hint" id="wmHint">Click the dog</span>
   <div class="wrap hero-in">
-    <h1 class="title"><span class="brand">MIRA</span>: A Multimodal Illustrated Deep Research Agent for Controllable Reports</h1>
+    <h1 class="title"><span class="tl"><span class="brand">MIRA</span>: A Multimodal Illustrated</span> <span class="tl">Deep Research Agent for Controllable Reports</span></h1>
     <p class="authors">
-      <span>Hongrui Wu<sup>1,3,*</sup></span><span>Kaiwen Tuo<sup>2,*</sup></span><span>Congcong Wang<sup>3,*</sup></span>
-      <span>Gen Li<sup>3</sup></span><span>Shuai Dong<sup>4</sup></span><span>Xinlei Yu<sup>5</sup></span>
-      <span>Yuqi Xu<sup>3</sup></span><span>Haowen Hou<sup>6</sup></span><span>Zelin Peng<sup>3</sup></span><span>Jiaqi Wang<sup>3,&dagger;</sup></span>
+      <span class="row"><span>Hongrui Wu<sup>1,3,*</sup></span><span>Kaiwen Tuo<sup>2,*</sup></span><span>Congcong Wang<sup>3,*</sup></span><span>Gen Li<sup>3</sup></span><span>Shuai Dong<sup>4</sup></span></span>
+      <span class="row"><span>Xinlei Yu<sup>5</sup></span><span>Yuqi Xu<sup>3</sup></span><span>Haowen Hou<sup>6</sup></span><span>Zelin Peng<sup>3</sup></span><span>Jiaqi Wang<sup>3,&dagger;</sup></span></span>
     </p>
     <p class="affils">
-      <span><sup>1</sup>Stanford University</span><span><sup>2</sup>The Hong Kong University of Science and Technology</span><span><sup>3</sup>JD.com</span>
-      <span><sup>4</sup>Fudan University</span><span><sup>5</sup>The Chinese University of Hong Kong</span><span><sup>6</sup>Shanghai Jiao Tong University</span>
+      <span class="row"><span><sup>1</sup>Stanford University</span><span><sup>2</sup>The Hong Kong University of Science and Technology</span><span><sup>3</sup>JD.com</span></span>
+      <span class="row"><span><sup>4</sup>Fudan University</span><span><sup>5</sup>The Chinese University of Hong Kong</span><span><sup>6</sup>Shanghai Jiao Tong University</span></span>
     </p>
     <p class="notes"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&dagger;</sup>Corresponding author &nbsp;&middot;&nbsp; Hongrui Wu did this work during an internship at JD.com.</p>
     <nav class="links" aria-label="Resources">
@@ -142,7 +141,7 @@
       <div class="sheet s1" aria-hidden="true"></div>
       <div class="page" id="casePage">
         <header class="case-head">
-          <span class="kicker" id="caseKicker"></span>
+          <div class="case-top"><span class="kicker" id="caseKicker"></span><button type="button" class="guide" id="tipsBtn" title="Show what this page can do"><span class="q" aria-hidden="true">?</span>Guide</button></div>
           <h3 class="case-title" id="caseTitle"></h3>
           <p class="qtext" id="caseQ"></p>
           <div class="runs" id="caseRuns" aria-label="Two runs of the same request"></div>
@@ -153,7 +152,6 @@
             <span class="grow"></span>
             <details class="menu" id="secMenu"><summary>Sections</summary><div class="pop"><ul class="toc" id="toc"></ul></div></details>
             <details class="menu" id="gateMenu"><summary id="gateSum">Report gate</summary><div class="pop"><ul class="gate-log" id="gateLog"></ul></div></details>
-            <button type="button" class="tips" id="tipsBtn" aria-label="Show what this page can do" title="Show what this page can do">?</button>
           </div>
           <div class="chips" aria-label="Annotation layers">
             <label class="on"><input type="checkbox" id="layer-clue" checked><span class="sw" style="background:var(--hl)"></span>Request terms<span class="cnt" data-cnt="mark.clue"></span></label>
@@ -162,7 +160,7 @@
             <label class="on"><input type="checkbox" id="layer-trace" checked><span class="sw" style="border:1px dashed var(--wine)"></span>Trace lines<span class="cnt" data-cnt=".rd-trace"></span></label>
           </div>
         </div>
-        <div class="coach" id="coach" hidden aria-hidden="true"><div class="halo"></div><div class="say"><b></b><span></span><small></small></div></div>
+        <div class="coach" id="coach" hidden><div class="halo"></div><div class="say" role="dialog" aria-label="Guide"><button type="button" class="x" aria-label="Close the guide">&times;</button><b></b><span></span><div class="nav"><small></small><button type="button" class="back" aria-label="Previous tip">&larr;</button><button type="button" class="next"></button></div></div></div>
         <div class="book" id="book">
           <div class="leaves">
             <div class="view" id="bookView" tabindex="0" aria-label="Report pages: use the arrow keys to turn them">

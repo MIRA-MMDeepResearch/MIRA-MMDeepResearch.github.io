@@ -20,22 +20,29 @@ $$('.looks button').forEach(b => b.addEventListener('click', () => setLook(b.dat
 /* ---------- watermark mascot ---------- */
 const wm = $('#wm'), hero = $('.hero'), wmHint = $('#wmHint');
 let clicks = 0;
+/* the title block lies over most of the mascot, so hover and clicks are judged by position rather than by the event target */
+function overWm(e, dogOnly) {
+  const r = wm.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  return dogOnly ? x > .07 && x < .75 && y > .28 && y < .9 : x > 0 && x < 1 && y > 0 && y < 1;
+}
 if (!reduce && matchMedia('(hover:hover)').matches) {
   hero.addEventListener('pointermove', e => {
     const r = hero.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-    wm.style.setProperty('--px', (x * -18).toFixed(1) + 'px');
-    wm.style.setProperty('--py', (y * -12).toFixed(1) + 'px');
+    wm.style.setProperty('--px', ((e.clientX - r.left) / r.width - .5).toFixed(3));   // each layer scales this by its own depth
+    wm.style.setProperty('--py', ((e.clientY - r.top) / r.height - .5).toFixed(3));
+    wm.classList.toggle('near', overWm(e));
   });
-  hero.addEventListener('pointerleave', () => { wm.style.setProperty('--px', '0px'); wm.style.setProperty('--py', '0px'); });
+  hero.addEventListener('pointerleave', () => { wm.style.setProperty('--px', '0'); wm.style.setProperty('--py', '0'); wm.classList.remove('near'); });
 }
 const barks = ['Woof.', 'Sniffing the web…', 'Found an image.', 'Checking the contract…'];
-wm.addEventListener('click', () => {
+function trick() {
   clicks++;
   wm.classList.remove('wag', 'flip'); void wm.offsetWidth;
   wm.classList.add(clicks % 5 === 0 ? 'flip' : 'wag');
   wmHint.textContent = clicks % 5 === 0 ? 'Good dog.' : barks[clicks % 4];
-});
+}
+wm.addEventListener('click', trick);
+hero.addEventListener('click', e => { if (!e.target.closest('a, button') && !String(getSelection()) && overWm(e, true)) trick(); });
 wm.addEventListener('animationend', e => { if (e.animationName === 'wag' || e.animationName === 'flip' || e.animationName === 'shine') wm.classList.remove('wag', 'flip'); });
 /* the cards slide in from the right on the first paint; from then on the dog and the cards drift and breathe on their own */
 if (!reduce) { wm.classList.add('enter'); setTimeout(() => wm.classList.add('idle'), 1600); }
@@ -251,6 +258,11 @@ host.addEventListener('mouseleave', () => { $$('td.hl-col, th.hl-col, tr.hl-row'
 
 /* ---------- step figures: a frosted grey-red veil over the whole figure; a crisp lens shows the current block ----------
    (clip-path does not clip backdrop-filter's blur in Chrome, so the hole is a second copy of the figure, clipped and laid over the veil) */
+const STEP_MS = 1800;
+/* scrolling under a resting pointer fires pointer events with unchanged coordinates; only a pointer that really moved counts as a hover */
+let lastXY = '', movedAt = 0;
+addEventListener('pointermove', e => { const xy = e.clientX + ',' + e.clientY; if (xy !== lastXY) { lastXY = xy; movedAt = performance.now(); } }, true);
+const pointerMoved = () => performance.now() - movedAt < 80;
 function initSteps(key, listId, stageId, capId) {
   const list = $(listId), stage = $(stageId), cap = $(capId), spot = $('.spot', stage), lens = $('.lens', stage), copy = $('img', lens), img = $('img', stage), steps = DATA.steps[key];
   const rest = cap.textContent;
@@ -272,20 +284,26 @@ function initSteps(key, listId, stageId, capId) {
     if (wasOff) void lens.offsetWidth;   // the lens jumps into place while still invisible, then only the opacity fades in
     stage.classList.add('on'); cap.textContent = steps[i].long || steps[i].d;
   }
-  /* once, when the figure scrolls into view, the lens walks through the steps by itself; any hover, tap or key takes over */
-  let auto = null, played = false;
-  function stopAuto() { if (auto) { clearTimeout(auto); auto = null; } }
+  /* whenever the figure scrolls into view, the lens walks through the steps by itself (a bar fills under the current one); a walk still
+     running is left alone, a finished one plays again on the next visit unless the reader has pinned a step. A real hover, tap or key takes over */
+  let auto = null, armed = true;
+  list.style.setProperty('--tick', STEP_MS + 'ms');
+  function stopAuto() { if (auto) { clearTimeout(auto); auto = null; } list.classList.remove('auto'); }
   function autoplay() {
-    played = true;
     let i = 0;
-    const tick = () => { if (i < steps.length) { show(i++); auto = setTimeout(tick, 1700); } else { auto = null; show(locked); } };
+    list.classList.add('auto');
+    const tick = () => { if (i < steps.length) { show(i++); auto = setTimeout(tick, STEP_MS); } else { stopAuto(); show(locked); } };
     tick();
   }
   if (!reduce) new IntersectionObserver(ens => ens.forEach(en => {
-    if (en.intersectionRatio >= .6 && !played) autoplay();
-    else if (!en.isIntersecting && auto) { stopAuto(); show(locked); }
+    if (en.intersectionRatio >= .6 && armed) { armed = false; if (!auto && locked == null) autoplay(); }
+    else if (!en.isIntersecting) armed = true;
   }), { threshold: [0, .6] }).observe(stage);
-  list.addEventListener('mouseover', e => { const b = e.target.closest('button'); if (b) { stopAuto(); show(+b.dataset.i); } });
+  list.addEventListener('pointermove', e => {
+    const b = e.target.closest('button');
+    if (!b || e.pointerType === 'touch' || !pointerMoved()) return;
+    if (auto || showing !== +b.dataset.i) { stopAuto(); show(+b.dataset.i); }
+  });
   list.addEventListener('mouseleave', () => { if (!auto) show(locked); });
   list.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; stopAuto(); const i = +b.dataset.i; locked = locked === i ? null : i; show(locked); });
   list.addEventListener('focusin', e => { const b = e.target.closest('button'); if (b) { stopAuto(); show(+b.dataset.i); } });
@@ -431,12 +449,12 @@ function play() {
 }
 playBtn.addEventListener('click', () => { if (timer) stop(); else play(); });
 drawTrace(); scrub.max = maxTurns; scrub.value = maxTurns; showTurns(maxTurns);
-/* the replay starts by itself when it scrolls into view (twice per visit at most), so nobody has to find the button */
+/* the replay starts by itself every time it scrolls into view, so nobody has to find the button; a run still playing is left alone */
 if (!reduce) {
-  let autoPlays = 0, armed = true;
+  let armed = true;
   new IntersectionObserver(ens => ens.forEach(en => {
-    if (en.intersectionRatio >= .45 && armed && autoPlays < 2) { armed = false; autoPlays++; setTimeout(() => { if (!timer) play(); }, 250); }
-    else if (!en.isIntersecting && !armed) { armed = true; }
+    if (en.intersectionRatio >= .45 && armed) { armed = false; setTimeout(() => { if (!timer) play(); }, 250); }
+    else if (!en.isIntersecting) armed = true;
   }), { threshold: [0, .45] }).observe($('#replay'));
 }
 
@@ -547,16 +565,19 @@ article.addEventListener('click', e => {
   if (iw) { const img = $('img', iw), fig = iw.closest('figure'); openLightbox(img.src, img.alt, $('figcaption', fig).textContent, $$('.rd-box', iw).map(b => b.outerHTML).join('')); }
 });
 
-/* ---------- coach marks: the first time the toolbar is fully in view, a halo slides over each control with a one-line tip; any click ends it, the ? button replays it ---------- */
+/* ---------- coach marks: whenever the toolbar comes fully into view after the deck has been off screen, a halo walks over each control with a
+   one-line tip. Back / Next step by hand (which stops the auto-advance), × or a click elsewhere closes it, the Guide button replays it ---------- */
 const coach = $('#coach'), halo = $('.halo', coach), say = $('.say', coach), tipsBtn = $('#tipsBtn'), toolbar = $('.toolbar', casePage);
+const tipBack = $('.back', say), tipNext = $('.next', say), TIP_MS = 3200;
 const TOUR = [
   ['#modeSwitch', 14, 'Two reports per request', 'Switch between the Concise and the Detail report of the same run.'],
   ['.toolbar .chips', 14, 'The paper’s annotation layers', 'Toggle request terms, checked facts and image boxes, paper notes and trace lines in the text.'],
   ['#secMenu', 999, 'Jump to a section', 'Every section of the report, with its page.'],
   ['#gateMenu', 999, 'What the report gate said', 'Its verdict on each draft, straight from the run.'],
   ['#nextPage', 999, 'Turn the page', 'The arrows, the ← → keys or a swipe; the dots below show where you are.'],
+  ['#tipsBtn', 999, 'This guide', 'It comes back when you return to the reports, and this button opens it any time.'],
 ];
-let tourT = null, toured = false;
+let tourT = null, tourAt = -1, tourShown = -1, tourPlan = [], guideArmed = true;   // tourAt: the tip on its way in; tourShown: the tip on screen
 function inView(el) { const r = el.getBoundingClientRect(); return r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; }
 function placeCoach(sel, rad) {
   const el = $(sel), pr = casePage.getBoundingClientRect(), r = el.getBoundingClientRect(), pad = 6;
@@ -566,35 +587,49 @@ function placeCoach(sel, rad) {
   say.style.left = sx + 'px'; say.style.top = (y + h + 12) + 'px';
   say.style.setProperty('--ax', Math.max(14, Math.min(sw - 25, x + Math.min(w / 2, 28) - sx - 5)) + 'px');
 }
-function endTour() { clearTimeout(tourT); tourT = null; coach.hidden = true; coach.classList.remove('swap'); }
+function endTour() { clearTimeout(tourT); tourT = null; tourAt = tourShown = -1; coach.hidden = true; coach.classList.remove('swap'); }
+function showTip(n, auto) {
+  clearTimeout(tourT); tourT = null;
+  const first = tourAt < 0, [sel, rad, title, text] = tourPlan[n];
+  tourAt = n;
+  if (!first) coach.classList.add('swap');
+  setTimeout(() => {
+    if (tourAt !== n) return;   // a quicker click has already moved on
+    tourShown = n;
+    $('b', say).textContent = title; $('span', say).textContent = text; $('small', say).textContent = `${n + 1} / ${tourPlan.length}`;
+    tipBack.disabled = n === 0; tipNext.textContent = n === tourPlan.length - 1 ? 'Done' : 'Next →';
+    if (first) { coach.classList.add('jump'); coach.hidden = false; }
+    placeCoach(sel, rad);
+    if (first) { void halo.offsetWidth; coach.classList.remove('jump'); }
+    coach.classList.remove('swap');
+  }, first ? 0 : 220);
+  if (auto) tourT = setTimeout(() => { if (n + 1 < tourPlan.length) showTip(n + 1, true); else endTour(); }, TIP_MS);
+}
 function startTour() {
   endTour();
-  const plan = TOUR.filter(t => inView($(t[0])));
-  if (!plan.length) return;
-  toured = true;
-  let n = 0;
-  const step = first => {
-    const [sel, rad, title, text] = plan[n], label = `${n + 1} / ${plan.length}`;
-    if (!first) coach.classList.add('swap');
-    setTimeout(() => {
-      $('b', say).textContent = title; $('span', say).textContent = text; $('small', say).textContent = label;
-      if (first) { coach.classList.add('jump'); coach.hidden = false; }
-      placeCoach(sel, rad);
-      if (first) { void halo.offsetWidth; coach.classList.remove('jump'); }
-      coach.classList.remove('swap');
-    }, first ? 0 : 220);
-    n++;
-    tourT = setTimeout(() => { if (n < plan.length) step(false); else endTour(); }, 2800);
-  };
-  step(true);
+  tourPlan = TOUR.filter(t => inView($(t[0])));
+  if (tourPlan.length) showTip(0, true);
 }
-if (!reduce) new IntersectionObserver(ens => ens.forEach(en => {
-  if (en.intersectionRatio >= .98 && !toured) { clearTimeout(tourT); tourT = setTimeout(startTour, 600); }
-  else if (!en.isIntersecting && tourT) endTour();
-}), { threshold: [0, .98] }).observe(toolbar);
-casePage.addEventListener('pointerdown', e => { if (!e.target.closest('#tipsBtn')) endTour(); }, true);
+tipBack.addEventListener('click', () => { if (tourShown > 0) showTip(tourShown - 1, false); });
+tipNext.addEventListener('click', () => { if (tourShown + 1 < tourPlan.length) showTip(tourShown + 1, false); else endTour(); });
+$('.x', say).addEventListener('click', endTour);
+if (!reduce) {
+  new IntersectionObserver(ens => ens.forEach(en => {
+    if (en.intersectionRatio >= .98 && guideArmed) { guideArmed = false; clearTimeout(tourT); tourT = setTimeout(startTour, 600); }
+    else if (!en.isIntersecting && (tourT || tourAt >= 0)) endTour();
+  }), { threshold: [0, .98] }).observe(toolbar);
+  // re-armed only once the whole report page has left the screen, so scrolling through the report itself does not bring the guide back
+  new IntersectionObserver(ens => ens.forEach(en => { if (!en.isIntersecting) guideArmed = true; })).observe(casePage);
+}
+casePage.addEventListener('pointerdown', e => { if (!e.target.closest('#tipsBtn, .coach .say')) endTour(); }, true);
 tipsBtn.addEventListener('click', startTour);
-addEventListener('resize', () => { if (tourT) endTour(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && tourAt >= 0) endTour(); });
+/* a late font or a new request reflows the page: the halo follows its control. Only a change of width (a rotation) ends the tour; a phone's
+   address bar sliding away on scroll changes just the height */
+function replaceTip() { if (tourShown >= 0 && !coach.hidden) placeCoach(tourPlan[tourShown][0], tourPlan[tourShown][1]); }
+new ResizeObserver(replaceTip).observe(casePage);
+let tourW = innerWidth;
+addEventListener('resize', () => { if (innerWidth === tourW) return replaceTip(); tourW = innerWidth; if (tourT || tourAt >= 0) endTour(); });
 
 /* ---------- switching requests ---------- */
 function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); renderReport(); }
