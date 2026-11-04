@@ -36,7 +36,9 @@ wm.addEventListener('click', () => {
   wm.classList.add(clicks % 5 === 0 ? 'flip' : 'wag');
   wmHint.textContent = clicks % 5 === 0 ? 'Good dog.' : barks[clicks % 4];
 });
-wm.addEventListener('animationend', () => wm.classList.remove('wag', 'flip'));
+wm.addEventListener('animationend', e => { if (e.animationName === 'wag' || e.animationName === 'flip' || e.animationName === 'shine') wm.classList.remove('wag', 'flip'); });
+/* the cards slide in from the right on the first paint; from then on the dog and the cards drift and breathe on their own */
+if (!reduce) { wm.classList.add('enter'); setTimeout(() => wm.classList.add('idle'), 1600); }
 
 /* ---------- mascot attract: a few wags when the hero is first seen, one more when the reader comes back ---------- */
 let heroSeen = false, autoWags = 0;
@@ -59,8 +61,10 @@ new IntersectionObserver(([en]) => {
 function updateSections() {
   const probe = scrollY + innerHeight * .38;
   let i = 0; secs.forEach((s, k) => { if (s && probe >= s.offsetTop) i = k; });
+  const atEnd = scrollY + innerHeight >= document.documentElement.scrollHeight - 4;   // the last section may be too short for the probe to reach it
+  if (atEnd) i = secs.length - 1;
   const top = secs[i].offsetTop, nextTop = secs[i + 1] ? secs[i + 1].offsetTop : top + secs[i].offsetHeight;
-  const frac = Math.max(0, Math.min(1, (probe - top) / Math.max(1, nextTop - top)));
+  const frac = atEnd ? 1 : Math.max(0, Math.min(1, (probe - top) / Math.max(1, nextTop - top)));
   const id = '#' + secs[i].id;
   navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === id));
   railLinks.forEach((a, k) => { a.classList.toggle('on', k === i); a.classList.toggle('done', k < i); });
@@ -68,6 +72,8 @@ function updateSections() {
   const nr = secnav.getBoundingClientRect();
   const cy = k => { const r = $('i', railLinks[k]).getBoundingClientRect(); return r.top + r.height / 2 - nr.top; };
   const c0 = cy(0), cN = cy(railLinks.length - 1), cur = cy(i), nxt = railLinks[i + 1] ? cy(i + 1) : cur;
+  const dot = $('i', railLinks[0]).getBoundingClientRect();
+  railTrack.style.left = railFill.style.left = (dot.left + dot.width / 2 - nr.left - 1) + 'px';
   railTrack.style.top = railFill.style.top = c0 + 'px';
   railTrack.style.height = (cN - c0) + 'px';
   railFill.style.height = Math.max(0, cur + frac * (nxt - cur) - c0) + 'px';
@@ -262,14 +268,27 @@ function initSteps(key, listId, stageId, capId) {
     if (wasOff) void lens.offsetWidth;   // the lens jumps into place while still invisible, then only the opacity fades in
     stage.classList.add('on'); cap.textContent = steps[i].long || steps[i].d;
   }
-  list.addEventListener('mouseover', e => { const b = e.target.closest('button'); if (b) show(+b.dataset.i); });
-  list.addEventListener('mouseleave', () => show(locked));
-  list.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const i = +b.dataset.i; locked = locked === i ? null : i; show(locked); });
-  list.addEventListener('focusin', e => { const b = e.target.closest('button'); if (b) show(+b.dataset.i); });
+  /* once, when the figure scrolls into view, the lens walks through the steps by itself; any hover, tap or key takes over */
+  let auto = null, played = false;
+  function stopAuto() { if (auto) { clearTimeout(auto); auto = null; } }
+  function autoplay() {
+    played = true;
+    let i = 0;
+    const tick = () => { if (i < steps.length) { show(i++); auto = setTimeout(tick, 1700); } else { auto = null; show(locked); } };
+    tick();
+  }
+  if (!reduce) new IntersectionObserver(ens => ens.forEach(en => {
+    if (en.intersectionRatio >= .6 && !played) autoplay();
+    else if (!en.isIntersecting && auto) { stopAuto(); show(locked); }
+  }), { threshold: [0, .6] }).observe(stage);
+  list.addEventListener('mouseover', e => { const b = e.target.closest('button'); if (b) { stopAuto(); show(+b.dataset.i); } });
+  list.addEventListener('mouseleave', () => { if (!auto) show(locked); });
+  list.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; stopAuto(); const i = +b.dataset.i; locked = locked === i ? null : i; show(locked); });
+  list.addEventListener('focusin', e => { const b = e.target.closest('button'); if (b) { stopAuto(); show(+b.dataset.i); } });
   addEventListener('resize', () => { if (showing != null) hole(showing); });
   img.addEventListener('load', () => { if (showing != null) hole(showing); });
   const open = () => openLightbox(img.src, img.alt, steps.map((s, i) => `${s.n ?? i + 1}. ${s.t}`).join(' · '), '');
-  stage.addEventListener('click', open);
+  stage.addEventListener('click', () => { stopAuto(); show(locked); open(); });
   $(`[data-zoom="${key}"]`).addEventListener('click', open);
 }
 initSteps('harness', '#harnessSteps', '#harnessStage', '#harnessCap');
@@ -282,7 +301,7 @@ const deck = $('#deck'), casePage = $('#casePage'), caseTabs = $('#caseTabs');
 function runTiles(c) {
   return MODES.map(m => { const r = c.runs[m]; return `<div class="run"><span class="mode">${m}</span><span class="stat"><b>${r.calls}</b><small>calls</small></span><span class="stat"><b>${r.turns}</b><small>turns</small></span><span class="stat"><b>${r.secs}</b><small>s</small></span></div>`; }).join('');
 }
-$('#replayKicker').textContent = `Replay · request 1 of ${CASES.length}`;
+$('#replayKicker').textContent = 'Tool-call replay · the first request, Concise and Detail runs';
 $('#replayTitle').textContent = REPLAY.title;
 $('#replayQ').textContent = '“' + REPLAY.question + '”';
 $('#replayRuns').innerHTML = runTiles(REPLAY);
@@ -464,7 +483,7 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
   if (/^(input|textarea|select)$/i.test(document.activeElement.tagName)) return;
   if (!book.matches(':hover') && !book.contains(document.activeElement)) return;
-  e.preventDefault(); go(pg + (e.key === 'ArrowRight' ? 1 : -1));
+  e.preventDefault(); endTour(); go(pg + (e.key === 'ArrowRight' ? 1 : -1));
 });
 let swipe = null;
 view.addEventListener('pointerdown', e => { swipe = e.pointerType === 'mouse' ? null : { x: e.clientX, y: e.clientY }; });
@@ -525,10 +544,60 @@ article.addEventListener('click', e => {
   if (iw) { const img = $('img', iw), fig = iw.closest('figure'); openLightbox(img.src, img.alt, $('figcaption', fig).textContent, $$('.rd-box', iw).map(b => b.outerHTML).join('')); }
 });
 
+/* ---------- coach marks: the first time the toolbar is fully in view, a halo slides over each control with a one-line tip; any click ends it, the ? button replays it ---------- */
+const coach = $('#coach'), halo = $('.halo', coach), say = $('.say', coach), tipsBtn = $('#tipsBtn'), toolbar = $('.toolbar', casePage);
+const TOUR = [
+  ['#modeSwitch', 14, 'Two reports per request', 'Switch between the Concise and the Detail report of the same run.'],
+  ['.toolbar .chips', 14, 'The paper’s annotation layers', 'Toggle request terms, checked facts and image boxes, paper notes and trace lines in the text.'],
+  ['#secMenu', 999, 'Jump to a section', 'Every section of the report, with its page.'],
+  ['#gateMenu', 999, 'What the report gate said', 'Its verdict on each draft, straight from the run.'],
+  ['#nextPage', 999, 'Turn the page', 'The arrows, the ← → keys or a swipe; the dots below show where you are.'],
+];
+let tourT = null, toured = false;
+function inView(el) { const r = el.getBoundingClientRect(); return r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; }
+function placeCoach(sel, rad) {
+  const el = $(sel), pr = casePage.getBoundingClientRect(), r = el.getBoundingClientRect(), pad = 6;
+  const x = r.left - pr.left - pad, y = r.top - pr.top - pad, w = r.width + 2 * pad, h = r.height + 2 * pad;
+  Object.assign(halo.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px', borderRadius: rad + 'px' });
+  const sw = say.offsetWidth, sx = Math.max(8, Math.min(x, pr.width - sw - 8));
+  say.style.left = sx + 'px'; say.style.top = (y + h + 12) + 'px';
+  say.style.setProperty('--ax', Math.max(14, Math.min(sw - 25, x + Math.min(w / 2, 28) - sx - 5)) + 'px');
+}
+function endTour() { clearTimeout(tourT); tourT = null; coach.hidden = true; coach.classList.remove('swap'); }
+function startTour() {
+  endTour();
+  const plan = TOUR.filter(t => inView($(t[0])));
+  if (!plan.length) return;
+  toured = true;
+  let n = 0;
+  const step = first => {
+    const [sel, rad, title, text] = plan[n], label = `${n + 1} / ${plan.length}`;
+    if (!first) coach.classList.add('swap');
+    setTimeout(() => {
+      $('b', say).textContent = title; $('span', say).textContent = text; $('small', say).textContent = label;
+      if (first) { coach.classList.add('jump'); coach.hidden = false; }
+      placeCoach(sel, rad);
+      if (first) { void halo.offsetWidth; coach.classList.remove('jump'); }
+      coach.classList.remove('swap');
+    }, first ? 0 : 220);
+    n++;
+    tourT = setTimeout(() => { if (n < plan.length) step(false); else endTour(); }, 2800);
+  };
+  step(true);
+}
+if (!reduce) new IntersectionObserver(ens => ens.forEach(en => {
+  if (en.intersectionRatio >= .98 && !toured) { clearTimeout(tourT); tourT = setTimeout(startTour, 600); }
+  else if (!en.isIntersecting && tourT) endTour();
+}), { threshold: [0, .98] }).observe(toolbar);
+casePage.addEventListener('pointerdown', e => { if (!e.target.closest('#tipsBtn')) endTour(); }, true);
+tipsBtn.addEventListener('click', startTour);
+addEventListener('resize', () => { if (tourT) endTour(); });
+
 /* ---------- switching requests ---------- */
 function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); renderReport(); }
 function switchCase(k) {
   if (k === cur || turning) return;
+  endTour();
   const top = deck.getBoundingClientRect().top;
   if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes
   if (reduce) { loadCase(k); return; }

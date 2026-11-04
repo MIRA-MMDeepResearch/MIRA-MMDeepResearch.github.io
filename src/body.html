@@ -29,10 +29,9 @@
 </div>
 
 <header class="hero" id="top">
-  <button class="wm" id="wm" type="button" aria-label="MIRA mascot: click for a trick"></button>
+  <button class="wm" id="wm" type="button" aria-label="MIRA mascot: click for a trick"><span class="wm-l dog"><span class="wm-s"></span></span><span class="wm-l wc c1"><span class="wm-s"></span></span><span class="wm-l wc c2"><span class="wm-s"></span></span><span class="wm-l wc c3"><span class="wm-s"></span></span><span class="wm-l dots"><span class="wm-s"></span></span></button>
   <span class="wm-hint" id="wmHint">Click the dog</span>
   <div class="wrap hero-in">
-    <p class="eyebrow"><b>arXiv 2610.25926</b> &middot; Multimodal deep research</p>
     <h1 class="title"><span class="brand">MIRA</span>: A Multimodal Illustrated Deep Research Agent for Controllable Reports</h1>
     <p class="authors">
       <span>Hongrui Wu<sup>1,3,*</sup></span><span>Kaiwen Tuo<sup>2,*</sup></span><span>Congcong Wang<sup>3,*</sup></span>
@@ -88,7 +87,6 @@
     <div class="sec-head">
       <span class="kicker">MIRA-Harness</span>
       <h2>A generation contract drives research, submission, and revision</h2>
-      <p>Hover or tap a step to follow the pipeline; click the figure to open it full size.</p>
     </div>
     <div class="card steps" data-fig="harness">
       <ol class="list" id="harnessSteps"></ol>
@@ -103,7 +101,6 @@
     <div class="sec-head">
       <span class="kicker">MIRA-Data</span>
       <h2>Trajectories synthesized inside the harness, gated, then balanced</h2>
-      <p>The same three steps as the paper's Figure, one at a time.</p>
     </div>
     <div class="card steps" data-fig="data">
       <ol class="list" id="dataSteps"></ol>
@@ -117,8 +114,8 @@
   <section class="block wide" id="case">
     <div class="sec-head">
       <span class="kicker">Case study</span>
-      <h2>One run replayed, six reports to page through</h2>
-      <p>Watch every tool call of the first request, then read each report on fixed-size pages with the paper's own annotations.</p>
+      <h2>Research requests answered end to end, from tool calls to illustrated reports</h2>
+      <p>The first request is replayed call by call, including the drafts the report gate sent back for revision. All three requests come with their Concise and Detail reports, annotated as in the paper's appendix: request terms, checked facts and image boxes, paper notes, and trace lines back to the run.</p>
     </div>
     <div class="card replay" id="replay">
       <div class="replay-head">
@@ -156,6 +153,7 @@
             <span class="grow"></span>
             <details class="menu" id="secMenu"><summary>Sections</summary><div class="pop"><ul class="toc" id="toc"></ul></div></details>
             <details class="menu" id="gateMenu"><summary id="gateSum">Report gate</summary><div class="pop"><ul class="gate-log" id="gateLog"></ul></div></details>
+            <button type="button" class="tips" id="tipsBtn" aria-label="Show what this page can do" title="Show what this page can do">?</button>
           </div>
           <div class="chips" aria-label="Annotation layers">
             <label class="on"><input type="checkbox" id="layer-clue" checked><span class="sw" style="background:var(--hl)"></span>Request terms<span class="cnt" data-cnt="mark.clue"></span></label>
@@ -164,6 +162,7 @@
             <label class="on"><input type="checkbox" id="layer-trace" checked><span class="sw" style="border:1px dashed var(--wine)"></span>Trace lines<span class="cnt" data-cnt=".rd-trace"></span></label>
           </div>
         </div>
+        <div class="coach" id="coach" hidden aria-hidden="true"><div class="halo"></div><div class="say"><b></b><span></span><small></small></div></div>
         <div class="book" id="book">
           <div class="leaves">
             <div class="view" id="bookView" tabindex="0" aria-label="Report pages: use the arrow keys to turn them">
@@ -198,7 +197,6 @@
   </section>
 </main>
 
-<footer class="foot wrap">Every number, square and highlight on this page comes from the paper's own tables, trajectories and annotated reports.</footer>
 
 <div class="looks" role="group" aria-label="Look">
   <span class="lab">Demo &middot; &#39118;&#26684;</span>

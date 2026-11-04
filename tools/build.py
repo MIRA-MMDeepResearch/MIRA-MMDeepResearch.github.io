@@ -135,9 +135,12 @@ assert '</script' not in js
 body = open(os.path.join(SRC, 'body.html'), encoding='utf-8').read()
 assert '{{' not in body
 head = open(os.path.join(SRC, 'head.html'), encoding='utf-8').read()
-mask = base64.b64encode(open(os.path.join(ASSETS, 'img', 'logo_mask.png'), 'rb').read()).decode()
-assert head.count('url("assets/img/logo_mask.png")') == 1
-head = head.replace('url("assets/img/logo_mask.png")', 'url("data:image/png;base64,%s")' % mask)
+for name in sorted(os.listdir(os.path.join(ASSETS, 'img'))):      # the mascot's mask layers travel inside the stylesheet
+    if name.startswith('wm_') and name.endswith('.png'):
+        ref = 'url("assets/img/%s")' % name
+        assert head.count(ref) == 1, ref
+        head = head.replace(ref, 'url("data:image/png;base64,%s")' % base64.b64encode(open(os.path.join(ASSETS, 'img', name), 'rb').read()).decode())
+assert 'assets/img/wm_' not in head
 head_lines = head.split('\n')
 assert head_lines[0].startswith('<title>') and 'claude:viewport-fit-sides' in head_lines[1], head_lines[:2]
 
