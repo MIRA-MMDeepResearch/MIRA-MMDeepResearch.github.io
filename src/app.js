@@ -258,12 +258,11 @@ host.addEventListener('mouseleave', () => { $$('td.hl-col, th.hl-col, tr.hl-row'
 
 /* ---------- step figures: a frosted grey-red veil over the whole figure; a crisp lens shows the current block ----------
    (clip-path does not clip backdrop-filter's blur in Chrome, so the hole is a second copy of the figure, clipped and laid over the veil) */
-const STEP_MS = 1800;
 /* scrolling under a resting pointer fires pointer events with unchanged coordinates; only a pointer that really moved counts as a hover */
 let lastXY = '', movedAt = 0;
 addEventListener('pointermove', e => { const xy = e.clientX + ',' + e.clientY; if (xy !== lastXY) { lastXY = xy; movedAt = performance.now(); } }, true);
 const pointerMoved = () => performance.now() - movedAt < 80;
-function initSteps(key, listId, stageId, capId) {
+function initSteps(key, listId, stageId, capId, stepMs) {
   const list = $(listId), stage = $(stageId), cap = $(capId), spot = $('.spot', stage), lens = $('.lens', stage), copy = $('img', lens), img = $('img', stage), steps = DATA.steps[key];
   const rest = cap.textContent;
   list.innerHTML = steps.map((st, i) => `<li><button type="button" data-i="${i}" aria-pressed="false"><span class="n">${st.n ?? i + 1}</span><span><b>${st.t}</b><span>${st.d}</span></span></button></li>`).join('');
@@ -287,12 +286,12 @@ function initSteps(key, listId, stageId, capId) {
   /* whenever the figure scrolls into view, the lens walks through the steps by itself (a bar fills under the current one); a walk still
      running is left alone, a finished one plays again on the next visit unless the reader has pinned a step. A real hover, tap or key takes over */
   let auto = null, armed = true;
-  list.style.setProperty('--tick', STEP_MS + 'ms');
+  list.style.setProperty('--tick', stepMs + 'ms');
   function stopAuto() { if (auto) { clearTimeout(auto); auto = null; } list.classList.remove('auto'); }
   function autoplay() {
     let i = 0;
     list.classList.add('auto');
-    const tick = () => { if (i < steps.length) { show(i++); auto = setTimeout(tick, STEP_MS); } else { stopAuto(); show(locked); } };
+    const tick = () => { if (i < steps.length) { show(i++); auto = setTimeout(tick, stepMs); } else { stopAuto(); show(locked); } };
     tick();
   }
   if (!reduce) new IntersectionObserver(ens => ens.forEach(en => {
@@ -313,8 +312,8 @@ function initSteps(key, listId, stageId, capId) {
   stage.addEventListener('click', () => { stopAuto(); show(locked); open(); });
   $(`[data-zoom="${key}"]`).addEventListener('click', open);
 }
-initSteps('harness', '#harnessSteps', '#harnessStage', '#harnessCap');
-initSteps('data', '#dataSteps', '#dataStage', '#dataCap');
+initSteps('harness', '#harnessSteps', '#harnessStage', '#harnessCap', 1200);   // five steps, so a quicker walk
+initSteps('data', '#dataSteps', '#dataStage', '#dataCap', 1800);
 
 /* ---------- case study: the first request's run is replayed once; the deck below holds every report ---------- */
 const CASES = DATA.cases, MODES = ['concise', 'detail'], REPLAY = CASES[0];
