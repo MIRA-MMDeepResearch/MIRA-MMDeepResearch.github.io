@@ -1,0 +1,1759 @@
+{
+"concrete": {
+"trace": {
+"concise": {
+"turns": [
+[
+{
+"k": "search",
+"a": "Roman maritime concrete seawater durability volcanic ash lime clasts aluminum to"
+},
+{
+"k": "search",
+"a": "Roman concrete microstructure SEM XRD volcanic ash pozzolana"
+},
+{
+"k": "search",
+"a": "Roman concrete vs Portland cement durability sustainable infrastructure"
+},
+{
+"k": "search",
+"a": "aluminum tobermorite Roman concrete formation seawater"
+}
+],
+[
+{
+"k": "page",
+"a": "https://scienceinsights.org/why-roman-concrete-is-so-strong-and-gets-stronger-ov"
+},
+{
+"k": "page",
+"a": "https://news.mit.edu/2023/roman-concrete-durability-lime-casts-0106"
+},
+{
+"k": "page",
+"a": "https://pubs.geoscienceworld.org/msa/ammin/article/98/10/1669/45726/Unlocking-th"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.sciencedirect.com/science/article/pii/S2589004225013136"
+},
+{
+"k": "page",
+"a": "https://als.lbl.gov/learning-from-roman-concrete/"
+},
+{
+"k": "page",
+"a": "https://www.thearchaeologist.org/blog/roman-concrete-secret-why-ancient-harbors-"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_1"
+},
+{
+"k": "image",
+"a": "page_img_2"
+},
+{
+"k": "image",
+"a": "page_img_15"
+},
+{
+"k": "image",
+"a": "page_img_16"
+},
+{
+"k": "image",
+"a": "page_img_17"
+},
+{
+"k": "image",
+"a": "page_img_21"
+},
+{
+"k": "image",
+"a": "page_img_22"
+},
+{
+"k": "image",
+"a": "page_img_26"
+},
+{
+"k": "image",
+"a": "page_img_27"
+},
+{
+"k": "image",
+"a": "page_img_28"
+}
+],
+[
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+],
+[
+{
+"k": "search",
+"a": "Roman concrete lime clasts self-healing MIT Admir Masic"
+},
+{
+"k": "search",
+"a": "Al-tobermorite Roman concrete seawater durability Berkeley"
+},
+{
+"k": "search",
+"a": "Roman concrete vs Portland cement sustainability volcanic ash"
+}
+],
+[
+{
+"k": "page",
+"a": "https://www.scientificamerican.com/article/ancient-roman-concrete-has-self-heali"
+},
+{
+"k": "page",
+"a": "https://newscenter.lbl.gov/2013/06/04/roman-concrete/"
+},
+{
+"k": "page",
+"a": "https://www.asme.org/topics-resources/content/ancient-roman-concrete-stands-test"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"5": {
+"accepted": false,
+"reason": "3 references unreachable"
+},
+"8": {
+"accepted": true,
+"reason": ""
+}
+}
+},
+"detail": {
+"turns": [
+[
+{
+"k": "search",
+"a": "Roman maritime concrete seawater durability volcanic ash lime clasts aluminum to"
+},
+{
+"k": "search",
+"a": "Roman concrete vs Portland cement durability marine environment sustainable infr"
+},
+{
+"k": "search",
+"a": "aluminum tobermorite Roman marine concrete Jackson 2017"
+},
+{
+"k": "search",
+"a": "lime clasts Roman concrete microstructure SEM"
+},
+{
+"k": "search",
+"a": "Roman pozzolana concrete composition XRF EPMA"
+}
+],
+[
+{
+"k": "page",
+"a": "https://pubs.geoscienceworld.org/msa/ammin/article/102/7/1435/353606/Phillipsite"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9821858/"
+},
+{
+"k": "page",
+"a": "https://www.science.org/doi/10.1126/sciadv.add1602"
+},
+{
+"k": "page",
+"a": "https://als.lbl.gov/learning-from-roman-concrete/"
+},
+{
+"k": "page",
+"a": "https://www.sciencedirect.com/science/article/pii/S2589004225013136"
+},
+{
+"k": "page",
+"a": "https://www.spectroscopyonline.com/view/using-orbis-micro-xrf-spectrometer-study"
+},
+{
+"k": "page",
+"a": "https://ancientengrtech.wisc.edu/roman-concrete/"
+},
+{
+"k": "page",
+"a": "https://news.mit.edu/2023/roman-concrete-durability-lime-casts-0106"
+},
+{
+"k": "page",
+"a": "https://ceramics.org/ceramic-tech-today/relict-no-more-purposeful-inclusion-of-l"
+},
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Roman_concrete"
+}
+],
+[
+{
+"k": "search",
+"a": "Jackson 2017 phillipsite al-tobermorite Roman marine concrete pdf"
+},
+{
+"k": "search",
+"a": "Seymour 2023 hot mixing Roman concrete PMC open access"
+},
+{
+"k": "search",
+"a": "Portland cement durability issues seawater chloride attack sulfate attack"
+},
+{
+"k": "image",
+"a": "page_img_1"
+},
+{
+"k": "image",
+"a": "page_img_2"
+},
+{
+"k": "image",
+"a": "page_img_3"
+},
+{
+"k": "image",
+"a": "page_img_4"
+},
+{
+"k": "image",
+"a": "page_img_5"
+},
+{
+"k": "image",
+"a": "page_img_6"
+},
+{
+"k": "image",
+"a": "page_img_7"
+},
+{
+"k": "image",
+"a": "page_img_8"
+},
+{
+"k": "image",
+"a": "page_img_21"
+},
+{
+"k": "image",
+"a": "page_img_22"
+},
+{
+"k": "image",
+"a": "page_img_25"
+},
+{
+"k": "image",
+"a": "page_img_26"
+},
+{
+"k": "image",
+"a": "page_img_35"
+},
+{
+"k": "image",
+"a": "page_img_36"
+},
+{
+"k": "image",
+"a": "page_img_37"
+},
+{
+"k": "image",
+"a": "page_img_38"
+},
+{
+"k": "image",
+"a": "page_img_41"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_35"
+},
+{
+"k": "image",
+"a": "page_img_36"
+},
+{
+"k": "image",
+"a": "page_img_39"
+},
+{
+"k": "image",
+"a": "page_img_40"
+},
+{
+"k": "image",
+"a": "page_img_42"
+},
+{
+"k": "image",
+"a": "page_img_9"
+},
+{
+"k": "image",
+"a": "page_img_10"
+},
+{
+"k": "image",
+"a": "page_img_17"
+},
+{
+"k": "image",
+"a": "page_img_18"
+},
+{
+"k": "image",
+"a": "page_img_19"
+},
+{
+"k": "image",
+"a": "page_img_20"
+},
+{
+"k": "image",
+"a": "page_img_23"
+},
+{
+"k": "image",
+"a": "page_img_24"
+},
+{
+"k": "image",
+"a": "page_img_27"
+},
+{
+"k": "image",
+"a": "page_img_28"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+],
+[
+{
+"k": "search",
+"a": "Roman concrete lime clasts self-healing Admir Masic 2023"
+},
+{
+"k": "search",
+"a": "Al-tobermorite Roman marine concrete Jackson 2017"
+},
+{
+"k": "search",
+"a": "Roman concrete vs Portland cement durability seawater"
+}
+],
+[
+{
+"k": "page",
+"a": "https://als.lbl.gov/ancient-roman-secret-concrete-resilience-seawater/"
+},
+{
+"k": "page",
+"a": "https://www.asme.org/topics-resources/content/ancient-roman-concrete-stands-test"
+},
+{
+"k": "page",
+"a": "https://kilgorecompanies.com/blog/2022/08/26/roman-concrete-vs-modern-concrete/"
+},
+{
+"k": "page",
+"a": "https://riskfrontiers.com/insights/why-is-roman-concrete-more-durable-than-moder"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_45"
+},
+{
+"k": "image",
+"a": "page_img_46"
+},
+{
+"k": "image",
+"a": "page_img_47"
+},
+{
+"k": "image",
+"a": "page_img_67"
+},
+{
+"k": "image",
+"a": "page_img_68"
+},
+{
+"k": "image",
+"a": "page_img_69"
+},
+{
+"k": "image",
+"a": "page_img_70"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+],
+[
+{
+"k": "search",
+"a": "Roman concrete durability seawater volcanic ash lime clasts self-healing"
+}
+],
+[
+{
+"k": "page",
+"a": "https://www.iom3.org/resource/roman-concrete.html"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"5": {
+"accepted": false,
+"reason": "1 required source missing; 4 references unreachable"
+},
+"9": {
+"accepted": false,
+"reason": "1 required source missing"
+},
+"12": {
+"accepted": true,
+"reason": ""
+}
+}
+}
+},
+"runs": {
+"concise": {
+"calls": 35,
+"turns": 8,
+"secs": 231
+},
+"detail": {
+"calls": 69,
+"turns": 12,
+"secs": 483
+}
+},
+"question": "Why does Roman maritime concrete demonstrate superior long-term durability in seawater compared to many modern Portland cement formulations, and what do microstructural studies and compositional analyses reveal about the role of volcanic ash, lime clasts, and aluminum tobermorite formation? I need to compare these ancient and modern materials systems for a unit on sustainable infrastructure materials."
+},
+"cam": {
+"trace": {
+"concise": {
+"turns": [
+[
+{
+"k": "search",
+"a": "CAM photosynthesis convergent evolution agaves cacti euphorbias anatomy cross-se"
+},
+{
+"k": "search",
+"a": "CAM carbon isotope ratio chart δ13C agave cactus euphorbia"
+},
+{
+"k": "search",
+"a": "nocturnal gas exchange diagram CAM CO2 uptake night"
+},
+{
+"k": "search",
+"a": "herbarium CAM anatomy micrograph agave cactus euphorbia"
+}
+],
+[
+{
+"k": "search",
+"a": "CAM leaf anatomy cross section micrograph herbarium"
+},
+{
+"k": "search",
+"a": "δ13C CAM agave cactus euphorbia chart"
+},
+{
+"k": "search",
+"a": "nocturnal CO2 uptake diagram CAM"
+},
+{
+"k": "search",
+"a": "convergent evolution desert plants agave cactus euphorbia CAM"
+},
+{
+"k": "search",
+"a": "public herbarium CAM photosynthesis anatomy"
+}
+],
+[
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799990/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10800000/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799998/"
+},
+{
+"k": "page",
+"a": "https://www.csustan.edu/biology/stan-state-greenhouse/convergent-evolution-deser"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5462028/"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_23"
+},
+{
+"k": "image",
+"a": "page_img_49"
+},
+{
+"k": "image",
+"a": "page_img_50"
+},
+{
+"k": "image",
+"a": "page_img_72"
+},
+{
+"k": "image",
+"a": "page_img_74"
+},
+{
+"k": "image",
+"a": "page_img_76"
+},
+{
+"k": "image",
+"a": "page_img_106"
+},
+{
+"k": "image",
+"a": "page_img_82"
+},
+{
+"k": "image",
+"a": "page_img_83"
+},
+{
+"k": "image",
+"a": "page_img_84"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"5": {
+"accepted": true,
+"reason": ""
+}
+}
+},
+"detail": {
+"turns": [
+[
+{
+"k": "search",
+"a": "CAM photosynthesis agave cactus euphorbia convergent evolution anatomical cross "
+},
+{
+"k": "search",
+"a": "CAM carbon isotope ratio chart δ13C agave cactus euphorbia"
+},
+{
+"k": "search",
+"a": "nocturnal gas exchange diagram CAM agave cactus euphorbia"
+},
+{
+"k": "search",
+"a": "public herbarium CAM anatomical cross section micrograph"
+}
+],
+[
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799990/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4085958/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC166772/"
+},
+{
+"k": "page",
+"a": "https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2020.57"
+},
+{
+"k": "page",
+"a": "https://www.researchgate.net/publication/266746538_Evolutionary_bursts_inEuphorb"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_23"
+},
+{
+"k": "image",
+"a": "page_img_45"
+},
+{
+"k": "image",
+"a": "page_img_48"
+},
+{
+"k": "image",
+"a": "page_img_78"
+},
+{
+"k": "image",
+"a": "page_img_79"
+}
+],
+[
+{
+"k": "search",
+"a": "cactus CAM photosynthesis anatomical cross section micrograph leaf anatomy"
+},
+{
+"k": "search",
+"a": "Euphorbia CAM photosynthesis leaf anatomy cross section micrograph"
+},
+{
+"k": "search",
+"a": "CAM photosynthesis cactus euphorbia convergent evolution δ13C carbon isotope"
+},
+{
+"k": "search",
+"a": "nocturnal gas exchange cactus CAM diagram"
+}
+],
+[
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10800000/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3628315/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4762382/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799998/"
+},
+{
+"k": "page",
+"a": "https://connectsci.au/fp/article/32/5/409/53098/Functional-leaf-anatomy-of-plant"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_139"
+},
+{
+"k": "image",
+"a": "page_img_140"
+},
+{
+"k": "image",
+"a": "page_img_116"
+},
+{
+"k": "image",
+"a": "page_img_117"
+},
+{
+"k": "image",
+"a": "page_img_112"
+}
+],
+[
+{
+"k": "search",
+"a": "CAM photosynthesis agave cactus euphorbia convergent evolution site:pmc.ncbi.nlm"
+},
+{
+"k": "search",
+"a": "CAM photosynthesis anatomical cross section micrograph site:pmc.ncbi.nlm.nih.gov"
+},
+{
+"k": "search",
+"a": "CAM carbon isotope ratio δ13C chart site:pmc.ncbi.nlm.nih.gov"
+},
+{
+"k": "search",
+"a": "nocturnal gas exchange CAM diagram site:pmc.ncbi.nlm.nih.gov"
+}
+],
+[
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799977/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799995/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799989/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4762382/"
+},
+{
+"k": "page",
+"a": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10799998/"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_215"
+},
+{
+"k": "image",
+"a": "page_img_216"
+},
+{
+"k": "image",
+"a": "page_img_240"
+},
+{
+"k": "image",
+"a": "page_img_264"
+},
+{
+"k": "image",
+"a": "page_img_266"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"10": {
+"accepted": true,
+"reason": ""
+}
+}
+}
+},
+"runs": {
+"concise": {
+"calls": 25,
+"turns": 5,
+"secs": 82
+},
+"detail": {
+"calls": 43,
+"turns": 10,
+"secs": 236
+}
+},
+"question": "How has CAM photosynthesis diversified across unrelated desert plant lineages, and what do anatomical cross-section micrographs, carbon isotope ratio charts, and nocturnal gas exchange diagrams from public herbarium and research collections reveal about the convergent evolutionary solutions to arid environments in agaves, cacti, and euphorbias?"
+},
+"traffic": {
+"trace": {
+"concise": {
+"turns": [
+[
+{
+"k": "search",
+"a": "\"traffic flow theory\" \"time-space diagram\" textbook education"
+},
+{
+"k": "search",
+"a": "\"microsimulation\" \"traffic engineering\" education lab"
+},
+{
+"k": "search",
+"a": "\"real-time data dashboard\" traffic engineering education"
+},
+{
+"k": "search",
+"a": "\"highway capacity analysis\" visualization education"
+},
+{
+"k": "search",
+"a": "\"traffic count sheet\" manual traffic engineering lab"
+}
+],
+[
+{
+"k": "page",
+"a": "https://eng.libretexts.org/Bookshelves/Civil_Engineering/Fundamentals_of_Transpo"
+},
+{
+"k": "page",
+"a": "https://victorknoop.eu/research/book/Knoop_Intro_traffic_flow_theory_edition2.pd"
+},
+{
+"k": "page",
+"a": "https://peer.asee.org/work-in-progress-moving-from-outside-to-inside-traffic-eng"
+},
+{
+"k": "page",
+"a": "https://journals.sagepub.com/doi/10.3141/2480-06"
+},
+{
+"k": "page",
+"a": "https://www.caliper.com/transmodeler/hcm-compatible.htm?srsltid=AU7gw4X5VP75vS2O"
+},
+{
+"k": "page",
+"a": "https://static.tti.tamu.edu/tti.tamu.edu/documents/1164-1.pdf"
+},
+{
+"k": "page",
+"a": "https://ndl.ethernet.edu.et/bitstream/123456789/2926/1/476.pdf"
+}
+],
+[
+{
+"k": "search",
+"a": "\"time-space diagram\" traffic engineering textbook image"
+},
+{
+"k": "search",
+"a": "\"level of service\" visualization traffic engineering education"
+},
+{
+"k": "search",
+"a": "\"intersection operations\" visualization education"
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" manual count sheet"
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education"
+}
+],
+[
+{
+"k": "page",
+"a": "https://docs.lib.purdue.edu/cgi/viewcontent.cgi?article=2987&context=roadschool"
+},
+{
+"k": "page",
+"a": "https://peer.asee.org/self-paced-instruction-to-introduce-traffic-engineering-in"
+},
+{
+"k": "page",
+"a": "https://www.scribd.com/document/586208903/Traffic-Engineering-Lab-Manual"
+},
+{
+"k": "page",
+"a": "https://www.esri.com/arcgis-blog/products/decision-support/decision-support/buil"
+},
+{
+"k": "page",
+"a": "https://www.emerald.com/books/monograph/10550/chapter/80103899/The-time-space-di"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_3"
+},
+{
+"k": "image",
+"a": "page_img_6"
+},
+{
+"k": "image",
+"a": "page_img_9"
+},
+{
+"k": "image",
+"a": "page_img_11"
+},
+{
+"k": "image",
+"a": "page_img_16"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic flow theory\" \"time-space diagram\" image site:.edu"
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" \"level of service\" diagram image"
+},
+{
+"k": "search",
+"a": "\"traffic engineering\" \"laboratory\" \"manual\" \"count\" sheet image"
+},
+{
+"k": "search",
+"a": "\"microsimulation\" \"animation\" \"traffic\" education image"
+},
+{
+"k": "search",
+"a": "\"intersection operations\" \"visualization\" \"traffic engineering\" image"
+}
+],
+[
+{
+"k": "search",
+"a": "\"time-space diagram\" traffic flow theory image"
+},
+{
+"k": "search",
+"a": "\"traffic count sheet\" manual traffic engineering"
+},
+{
+"k": "search",
+"a": "\"level of service\" traffic engineering diagram"
+},
+{
+"k": "search",
+"a": "\"microsimulation\" traffic animation education"
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education"
+}
+],
+[
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Traffic_flow"
+},
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Level_of_service_(transportation)"
+},
+{
+"k": "page",
+"a": "https://www.fhwa.dot.gov/policyinformation/pubs/pl18003/chap00.cfm"
+},
+{
+"k": "page",
+"a": "https://www.txdot.gov/manuals/des/tsp/chapter-13-microsimulation-analysis.html"
+},
+{
+"k": "page",
+"a": "https://www.ptvgroup.com/en-us/products/ptv-vissim"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_49"
+},
+{
+"k": "image",
+"a": "page_img_51"
+},
+{
+"k": "image",
+"a": "page_img_52"
+},
+{
+"k": "image",
+"a": "page_img_62"
+},
+{
+"k": "image",
+"a": "page_img_63"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\" textbook"
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\" textbook"
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\" visualization"
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\" education"
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education \"student project\""
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\" \"student\""
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\" \"textbook\""
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\" \"visualization\""
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\" \"education\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" \"education\" \"student\""
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\""
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\""
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\""
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\""
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\""
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\""
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\""
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\""
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\""
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"visualization\" \"microsimulation\" \"student\""
+},
+{
+"k": "search",
+"a": "\"traffic flow theory\" education \"time-space diagram\" \"textbook\""
+},
+{
+"k": "search",
+"a": "\"highway capacity manual\" education \"level of service\" \"visualization\""
+},
+{
+"k": "search",
+"a": "\"traffic engineering laboratory\" \"manual count\" \"education\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" \"education\" \"student\""
+}
+],
+[
+{
+"k": "page",
+"a": "https://onlinepubs.trb.org/onlinepubs/sr/sr165/165.pdf"
+},
+{
+"k": "page",
+"a": "https://www.victorknoop.eu/research/book/Knoop_Intro_traffic_flow_theory_edition"
+},
+{
+"k": "page",
+"a": "https://onlinepubs.trb.org/onlinepubs/circulars/ec190.pdf"
+},
+{
+"k": "page",
+"a": "https://www.nationalacademies.org/read/29143"
+},
+{
+"k": "page",
+"a": "https://dokumen.pub/an-introduction-to-traffic-flow-theory-1461484340-978-1-4614"
+}
+],
+[
+{
+"k": "page",
+"a": "https://www.nationalacademies.org/read/29143"
+},
+{
+"k": "page",
+"a": "https://dokumen.pub/an-introduction-to-traffic-flow-theory-1461484340-978-1-4614"
+},
+{
+"k": "page",
+"a": "https://www.sciencedirect.com/topics/engineering/highway-capacity-manual"
+},
+{
+"k": "page",
+"a": "https://lewis.ucla.edu/research/calculating-bicycle-pedestrian-levels-service/"
+},
+{
+"k": "page",
+"a": "https://pdfcoffee.com/lab-3-amp-4-traffic-volume-study-and-junction-analysis-pdf"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_103"
+},
+{
+"k": "image",
+"a": "page_img_105"
+},
+{
+"k": "image",
+"a": "page_img_127"
+},
+{
+"k": "image",
+"a": "page_img_147"
+},
+{
+"k": "image",
+"a": "page_img_175"
+},
+{
+"k": "image",
+"a": "page_img_179"
+},
+{
+"k": "image",
+"a": "page_img_181"
+},
+{
+"k": "image",
+"a": "page_img_188"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic engineering\" education \"time-space diagram\" textbook"
+},
+{
+"k": "search",
+"a": "\"microsimulation\" \"traffic engineering\" education \"student\""
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" \"education\" \"student project\""
+},
+{
+"k": "search",
+"a": "\"traffic count sheet\" \"manual\" \"education\" \"laboratory\""
+},
+{
+"k": "search",
+"a": "\"level of service\" \"visualization\" \"traffic engineering\" education"
+}
+],
+[
+{
+"k": "search",
+"a": "\"traffic flow theory\" \"time-space diagram\" site:edu"
+},
+{
+"k": "search",
+"a": "\"microsimulation\" \"traffic engineering\" education site:edu"
+},
+{
+"k": "search",
+"a": "\"real-time traffic dashboard\" education site:edu"
+},
+{
+"k": "search",
+"a": "\"traffic count sheet\" manual site:edu"
+},
+{
+"k": "search",
+"a": "\"level of service\" visualization traffic engineering site:edu"
+}
+],
+[
+{
+"k": "page",
+"a": "https://static.tti.tamu.edu/tti.tamu.edu/documents/1164-1.pdf"
+},
+{
+"k": "page",
+"a": "https://library.ctr.utexas.edu/digitized/texasarchive/phase3/tx_ms81_1965.pdf"
+},
+{
+"k": "page",
+"a": "https://mctrans.ce.ufl.edu/converting-highway-capacity-analysis-files-to-traffic"
+},
+{
+"k": "page",
+"a": "https://docs.lib.purdue.edu/jtrpaffdocs/45/"
+},
+{
+"k": "page",
+"a": "https://ttap.utk.edu/course/introduction-to-highway-capacity-analysis/"
+}
+],
+[
+{
+"k": "page",
+"a": "https://static.tti.tamu.edu/tti.tamu.edu/documents/1164-1.pdf"
+},
+{
+"k": "page",
+"a": "https://library.ctr.utexas.edu/digitized/texasarchive/phase3/tx_ms81_1965.pdf"
+},
+{
+"k": "page",
+"a": "https://mctrans.ce.ufl.edu/converting-highway-capacity-analysis-files-to-traffic"
+},
+{
+"k": "page",
+"a": "https://docs.lib.purdue.edu/jtrpaffdocs/45/"
+},
+{
+"k": "page",
+"a": "https://ttap.utk.edu/course/introduction-to-highway-capacity-analysis/"
+}
+],
+[
+{
+"k": "page",
+"a": "https://static.tti.tamu.edu/tti.tamu.edu/documents/1164-1.pdf"
+},
+{
+"k": "page",
+"a": "https://library.ctr.utexas.edu/digitized/texasarchive/phase3/tx_ms81_1965.pdf"
+},
+{
+"k": "page",
+"a": "https://mctrans.ce.ufl.edu/converting-highway-capacity-analysis-files-to-traffic"
+},
+{
+"k": "page",
+"a": "https://docs.lib.purdue.edu/jtrpaffdocs/45/"
+},
+{
+"k": "page",
+"a": "https://ttap.utk.edu/course/introduction-to-highway-capacity-analysis/"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"24": {
+"accepted": false,
+"reason": "1 reference unreachable"
+},
+"25": {
+"accepted": true,
+"reason": ""
+}
+}
+},
+"detail": {
+"turns": [
+[
+{
+"k": "search",
+"a": "traffic flow theory visualization education textbook time-space diagram"
+},
+{
+"k": "search",
+"a": "microsimulation VISSIM education traffic engineering laboratory"
+},
+{
+"k": "search",
+"a": "real-time traffic data dashboard civil engineering education"
+},
+{
+"k": "search",
+"a": "highway capacity analysis student project visualization"
+},
+{
+"k": "search",
+"a": "level of service LOS visualization traffic engineering education"
+},
+{
+"k": "search",
+"a": "traffic count sheet manual counting laboratory exercise"
+}
+],
+[
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Traffic_flow"
+},
+{
+"k": "page",
+"a": "https://www.springerprofessional.de/en/an-introduction-to-traffic-flow-theory/27"
+},
+{
+"k": "page",
+"a": "https://tesp.utk.edu/facilities/traffic-simulation-lab/"
+},
+{
+"k": "page",
+"a": "https://mctrans.ce.ufl.edu/training/hca/"
+},
+{
+"k": "page",
+"a": "https://ops.fhwa.dot.gov/publications/fhwahop10023/fhwahop10023.pdf"
+},
+{
+"k": "page",
+"a": "https://f.hubspotusercontent10.net/hubfs/6192260/Spack_Solutions_May2021/Pdf/Spa"
+},
+{
+"k": "page",
+"a": "https://www.nyc.gov/html/dot/html/about/datafeeds.shtml"
+},
+{
+"k": "page",
+"a": "https://www.researchgate.net/publication/393346298_Machine_Learning_Approach_in_"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_32"
+},
+{
+"k": "image",
+"a": "page_img_34"
+},
+{
+"k": "image",
+"a": "page_img_35"
+},
+{
+"k": "image",
+"a": "page_img_45"
+},
+{
+"k": "image",
+"a": "page_img_46"
+},
+{
+"k": "image",
+"a": "page_img_56"
+},
+{
+"k": "image",
+"a": "page_img_57"
+},
+{
+"k": "image",
+"a": "page_img_58"
+}
+],
+[
+{
+"k": "search",
+"a": "traffic flow theory textbook visualization time-space diagram education"
+},
+{
+"k": "search",
+"a": "microsimulation student project traffic engineering VISSIM animation"
+},
+{
+"k": "search",
+"a": "level of service visualization traffic engineering textbook diagram"
+},
+{
+"k": "search",
+"a": "intersection operations visualization traffic engineering education"
+},
+{
+"k": "search",
+"a": "real-time traffic dashboard civil engineering classroom education"
+},
+{
+"k": "search",
+"a": "traffic count sheet manual counting laboratory exercise university"
+}
+],
+[
+{
+"k": "page",
+"a": "https://onlinepubs.trb.org/onlinepubs/sr/sr165/165.pdf"
+},
+{
+"k": "page",
+"a": "https://www.nationalacademies.org/read/29143/chapter/4"
+},
+{
+"k": "page",
+"a": "https://www.esri.com/arcgis-blog/products/decision-support/decision-support/buil"
+},
+{
+"k": "page",
+"a": "https://www.trafficmobility.com/services/traffic-engineering/"
+},
+{
+"k": "page",
+"a": "https://library.ctr.utexas.edu/digitized/texasarchive/thdresearch/dht-24.pdf"
+},
+{
+"k": "page",
+"a": "https://www.scribd.com/doc/196910229/Traffic-Volume-Counts"
+}
+],
+[
+{
+"k": "search",
+"a": "\"Traffic Engineering\" textbook visualization time-space diagram"
+},
+{
+"k": "search",
+"a": "microsimulation animation traffic engineering student project VISSIM"
+},
+{
+"k": "search",
+"a": "level of service LOS diagram textbook traffic engineering"
+},
+{
+"k": "search",
+"a": "intersection operations visualization traffic engineering education"
+},
+{
+"k": "search",
+"a": "real-time traffic dashboard civil engineering education classroom"
+}
+],
+[
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Level_of_service_(transportation)"
+},
+{
+"k": "page",
+"a": "https://www.scribd.com/document/787924234/1-Trajectories-and-time-space-diagram"
+},
+{
+"k": "page",
+"a": "https://www.ptvgroup.com/en-us/products/ptv-vissim"
+},
+{
+"k": "page",
+"a": "https://wsdot.wa.gov/sites/default/files/2021-03/TrafficOps-VISSIM-Protocol.pdf"
+},
+{
+"k": "page",
+"a": "https://www.inetsoft.com/info/traffic-management-dashboard/"
+},
+{
+"k": "page",
+"a": "https://www.ite.org/technical-resources/topics/traffic-engineering/"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_134"
+},
+{
+"k": "image",
+"a": "page_img_135"
+},
+{
+"k": "image",
+"a": "page_img_136"
+},
+{
+"k": "image",
+"a": "page_img_81"
+},
+{
+"k": "image",
+"a": "page_img_82"
+},
+{
+"k": "image",
+"a": "page_img_84"
+},
+{
+"k": "image",
+"a": "page_img_86"
+},
+{
+"k": "image",
+"a": "page_img_91"
+}
+],
+[
+{
+"k": "search",
+"a": "\"Traffic Engineering\" textbook \"time-space diagram\" figure"
+},
+{
+"k": "search",
+"a": "microsimulation VISSIM student project traffic engineering visualization"
+},
+{
+"k": "search",
+"a": "level of service LOS diagram traffic engineering textbook figure"
+},
+{
+"k": "search",
+"a": "intersection operations visualization traffic engineering education"
+},
+{
+"k": "search",
+"a": "real-time traffic dashboard civil engineering education classroom"
+}
+],
+[
+{
+"k": "search",
+"a": "Highway Capacity Manual level of service LOS A B C D E F diagram"
+},
+{
+"k": "search",
+"a": "traffic flow theory fundamental diagram speed flow density textbook"
+},
+{
+"k": "search",
+"a": "microsimulation traffic engineering education VISSIM laboratory"
+}
+],
+[
+{
+"k": "page",
+"a": "https://en.wikipedia.org/wiki/Fundamental_diagram_of_traffic_flow"
+},
+{
+"k": "page",
+"a": "https://www.eldoradocounty.ca.gov/files/assets/county/v/1/documents/government/t"
+},
+{
+"k": "page",
+"a": "https://www.nationalacademies.org/read/29076/chapter/8"
+},
+{
+"k": "page",
+"a": "https://connected-corridors.berkeley.edu/sites/default/files/Fundamental%20Diagr"
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_183"
+},
+{
+"k": "image",
+"a": "page_img_185"
+},
+{
+"k": "image",
+"a": "page_img_186"
+}
+],
+[
+{
+"k": "search",
+"a": "traffic engineering textbook \"time-space diagram\" figure"
+}
+],
+[
+{
+"k": "page",
+"a": "https://eng.libretexts.org/Bookshelves/Civil_Engineering/Fundamentals_of_Transpo"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+],
+[
+{
+"k": "image",
+"a": "page_img_202"
+},
+{
+"k": "image",
+"a": "page_img_203"
+}
+],
+[
+{
+"k": "submit",
+"a": ""
+}
+]
+],
+"submissions": {
+"15": {
+"accepted": false,
+"reason": "2 cited images never opened; 2 image paths not from the run"
+},
+"17": {
+"accepted": true,
+"reason": ""
+}
+}
+}
+},
+"runs": {
+"concise": {
+"calls": 122,
+"turns": 25,
+"secs": 550
+},
+"detail": {
+"calls": 74,
+"turns": 17,
+"secs": 367
+}
+},
+"question": "How has the visualization of traffic flow theory and highway capacity analysis evolved in civil engineering education, from time-space diagrams and manual traffic count sheets to microsimulation animations and real-time data dashboards? I'm interested in examining how textbooks, laboratory exercises, and student projects have represented congestion patterns, level of service concepts, and intersection operations through different visual media."
+}
+}
