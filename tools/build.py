@@ -74,6 +74,30 @@ CASES = [
    'traj': 'case/traffic/%s/trajectory.json'},
 ]
 MODES = ('concise', 'detail')
+
+
+def image_size(path):
+    """(width, height) of a PNG or JPEG without any imaging library."""
+    import struct
+    data = open(path, 'rb').read()
+    if data[:8] == b'\x89PNG\r\n\x1a\n':
+        return struct.unpack('>II', data[16:24])
+    assert data[:2] == b'\xff\xd8', path
+    i = 2
+    while i < len(data):
+        if data[i] != 0xFF:
+            i += 1
+            continue
+        marker = data[i + 1]
+        if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+            i += 2
+            continue
+        seg = struct.unpack('>H', data[i + 2:i + 4])[0]
+        if marker in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+            h, w = struct.unpack('>HH', data[i + 5:i + 9])
+            return (w, h)
+        i += 2 + seg
+    raise ValueError(path)
 traces_path = os.path.join(DATA, 'traces.json')
 if all(os.path.exists(os.path.join(ROOT, c['traj'] % m)) for c in CASES for m in MODES):
     from traj2json import convert       # noqa: E402
@@ -93,11 +117,13 @@ for c in CASES:
     for m in MODES:
         doc = parse(open(os.path.join(DATA, 'reports', '%s_%s.tex' % (c['id'], m)), encoding='utf-8').read())
         figs = [b for s in doc['sections'] for b in s['blocks'] if b['type'] == 'figure']
+        dims = {}
         for b in figs:
             p = os.path.join(ASSETS, 'reports', c['id'], b['file'])
             assert os.path.exists(p), p
+            dims[b['file']] = image_size(p)   # width/height attributes keep the paginated reader stable before the images load
         assert doc['references'], 'no references parsed for %s %s' % (c['id'], m)
-        report[m] = {'html': render(doc, 'assets/reports/%s/' % c['id']), 'images': len(figs), 'refs': len(doc['references'])}
+        report[m] = {'html': render(doc, 'assets/reports/%s/' % c['id'], dims), 'images': len(figs), 'refs': len(doc['references'])}
     cases.append({'id': c['id'], 'title': c['title'], 'tab': c['tab'], 'kicker': c['kicker'], 'question': t['question'],
                   'runs': t['runs'], 'trace': t['trace'], 'report': report})
     print(c['id'], t['runs'], {m: (report[m]['images'], report[m]['refs']) for m in MODES}, file=sys.stderr)

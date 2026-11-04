@@ -205,7 +205,7 @@ def parse(src):
     return doc
 
 
-def render(doc, img_prefix):
+def render(doc, img_prefix, dims=None):
     out = []
     out.append('<header class="rd-head"><h3 class="rd-title">%s</h3></header>' % doc['title'])
     cite_first = {}
@@ -230,8 +230,9 @@ def render(doc, img_prefix):
                 boxes = ''.join('<i class="rd-box" style="left:%.1f%%;top:%.1f%%;width:%.1f%%;height:%.1f%%"></i>'
                                 % (x0 * 100, (1 - y1) * 100, (x1 - x0) * 100, (y1 - y0) * 100) for x0, y0, x1, y1, _ in b['boxes'])
                 out.append('<figure class="rd-fig" id="img-%d" data-img="%d" data-turns="%s">' % (b['n'], b['n'], turns))
-                out.append('<button type="button" class="rd-imgwrap" aria-label="Open image %d full size"><img src="%s%s" alt="%s" loading="lazy" decoding="async">%s</button>'
-                           % (b['n'], img_prefix, b['file'], html.escape(re.sub('<[^>]+>', '', b['caption'])), boxes))
+                out.append('<button type="button" class="rd-imgwrap" aria-label="Open image %d full size"><img src="%s%s" alt="%s"%s decoding="async">%s</button>'
+                           % (b['n'], img_prefix, b['file'], html.escape(re.sub('<[^>]+>', '', b['caption'])),
+                              ' width="%d" height="%d"' % dims[b['file']] if dims and b['file'] in dims else '', boxes))
                 out.append('<figcaption><span class="rd-fign">Image %d</span> %s</figcaption>' % (b['n'], b['caption']))
                 if tr:
                     out.append('<div class="rd-trace" data-layer="trace" data-turns="%s"><span class="rd-trace-tag">Trace</span> <span class="rd-trace-label">%s</span>'

@@ -93,7 +93,7 @@
     <div class="card steps" data-fig="harness">
       <ol class="list" id="harnessSteps"></ol>
       <div>
-        <div class="stage" id="harnessStage"><img src="assets/img/harness_overview.png" width="2400" height="939" alt="MIRA-Harness pipeline: a query and report mode become a generation contract, which guides multimodal research, evidence tracking, report submission and feedback-driven revision before delivery."><div class="spot"></div></div>
+        <div class="stage" id="harnessStage"><img src="assets/img/harness_overview.png" width="2400" height="939" alt="MIRA-Harness pipeline: a query and report mode become a generation contract, which guides multimodal research, evidence tracking, report submission and feedback-driven revision before delivery."><div class="spot"></div><i class="lens" aria-hidden="true"><img src="assets/img/harness_overview.png" width="2400" height="939" alt="" decoding="sync"></i></div>
         <div class="stage-foot"><span id="harnessCap">Hover or tap a step to light up its part of the figure.</span><button type="button" data-zoom="harness">Open full size</button></div>
       </div>
     </div>
@@ -108,7 +108,7 @@
     <div class="card steps" data-fig="data">
       <ol class="list" id="dataSteps"></ol>
       <div>
-        <div class="stage" id="dataStage"><img src="assets/img/data_synthesis.png" width="2400" height="1013" alt="Trajectory synthesis: a query generator builds report requests and rubrics, a teacher model runs inside MIRA-Harness, and a synthesis gate checks rubric coverage and trajectory integrity before trajectories join MIRA-Data."><div class="spot"></div></div>
+        <div class="stage" id="dataStage"><img src="assets/img/data_synthesis.png" width="2400" height="1013" alt="Trajectory synthesis: a query generator builds report requests and rubrics, a teacher model runs inside MIRA-Harness, and a synthesis gate checks rubric coverage and trajectory integrity before trajectories join MIRA-Data."><div class="spot"></div><i class="lens" aria-hidden="true"><img src="assets/img/data_synthesis.png" width="2400" height="1013" alt="" decoding="sync"></i></div>
         <div class="stage-foot"><span id="dataCap">Hover or tap a step to light up its part of the figure.</span><button type="button" data-zoom="data">Open full size</button></div>
       </div>
     </div>
@@ -117,11 +117,29 @@
   <section class="block wide" id="case">
     <div class="sec-head">
       <span class="kicker">Case study</span>
-      <h2>Three requests, two modes each, every tool call on record</h2>
-      <p>Pull a case to the front, replay its run turn by turn, then read either report with the paper's own annotations.</p>
+      <h2>One run replayed, six reports to page through</h2>
+      <p>Watch every tool call of the first request, then read each report on fixed-size pages with the paper's own annotations.</p>
+    </div>
+    <div class="card replay" id="replay">
+      <div class="replay-head">
+        <div class="lead">
+          <span class="kicker" id="replayKicker"></span>
+          <h3 id="replayTitle"></h3>
+          <p class="qtext" id="replayQ"></p>
+        </div>
+        <div class="runs" id="replayRuns" aria-label="Two runs of the same request"></div>
+      </div>
+      <div class="trace-top">
+        <button type="button" class="play" id="playBtn">&#9654; Replay the run</button>
+        <input type="range" id="scrub" min="0" max="12" value="12" aria-label="Turn">
+        <span class="counter" id="counter"></span>
+        <div class="legend" id="traceLegend" role="group" aria-label="Tool kinds"></div>
+      </div>
+      <div class="trace-scroll" id="traceScroll"><svg id="trace" role="img" aria-label="Tool calls per assistant turn in Concise and Detail mode"></svg><div class="tip" id="traceTip"></div></div>
+      <p class="hint">Recorded inside MIRA-Harness: each square is one tool call, one column per assistant turn. Hover a square to see the call. A cross marks a draft the report gate rejected, a tick the accepted one; the tinted band is the revision that followed.</p>
     </div>
     <div class="deck" id="deck">
-      <div class="tabs" id="caseTabs" role="tablist" aria-label="Cases"></div>
+      <div class="tabs" id="caseTabs" role="tablist" aria-label="Requests"></div>
       <div class="stack">
       <div class="sheet s2" aria-hidden="true"></div>
       <div class="sheet s1" aria-hidden="true"></div>
@@ -132,41 +150,33 @@
           <p class="qtext" id="caseQ"></p>
           <div class="runs" id="caseRuns" aria-label="Two runs of the same request"></div>
         </header>
-        <div class="card trace-card">
-          <div class="trace-top">
-            <button type="button" class="play" id="playBtn">&#9654; Replay the run</button>
-            <input type="range" id="scrub" min="0" max="12" value="12" aria-label="Turn">
-            <span class="counter" id="counter"></span>
-            <div class="legend" id="traceLegend" role="group" aria-label="Tool kinds"></div>
-          </div>
-          <div class="trace-scroll" id="traceScroll"><svg id="trace" role="img" aria-label="Tool calls per assistant turn in Concise and Detail mode"></svg><div class="tip" id="traceTip"></div></div>
-          <p class="hint">Recorded inside MIRA-Harness: each square is one tool call, one column per assistant turn. Hover a square to see the call. A cross marks a draft the report gate rejected, a tick the accepted one; the tinted band is the revision that followed. Hovering a <em>Trace</em> line in the report below lights up the turns it came from.</p>
-        </div>
-        <div class="reader">
-          <article class="card article show-clue show-fact show-note show-trace" id="article">
+        <div class="toolbar">
+          <div class="row">
             <div class="modes" id="modeSwitch" role="tablist" aria-label="Report mode"></div>
-            <div id="articleBody"></div>
-          </article>
-          <aside class="rail" aria-label="Reading tools">
-            <div class="card box">
-              <h5>Layers</h5>
-              <div class="layers">
-                <label><input type="checkbox" id="layer-clue" checked><span class="sw" style="background:var(--hl)"></span>Request terms<span class="cnt" data-cnt="mark.clue"></span></label>
-                <label><input type="checkbox" id="layer-fact" checked><span class="sw" style="background:var(--rose);border-bottom:2px wavy var(--wine)"></span>Checked facts &amp; image boxes<span class="cnt" data-cnt="mark.fact"></span></label>
-                <label><input type="checkbox" id="layer-note" checked><span class="sw" style="background:var(--tint);border-left:3px solid var(--wine)"></span>Paper notes<span class="cnt" data-cnt=".rd-note"></span></label>
-                <label><input type="checkbox" id="layer-trace" checked><span class="sw" style="border:1px dashed var(--wine)"></span>Trace lines<span class="cnt" data-cnt=".rd-trace"></span></label>
-              </div>
+            <span class="grow"></span>
+            <details class="menu" id="secMenu"><summary>Sections</summary><div class="pop"><ul class="toc" id="toc"></ul></div></details>
+            <details class="menu" id="gateMenu"><summary id="gateSum">Report gate</summary><div class="pop"><ul class="gate-log" id="gateLog"></ul></div></details>
+          </div>
+          <div class="chips" aria-label="Annotation layers">
+            <label class="on"><input type="checkbox" id="layer-clue" checked><span class="sw" style="background:var(--hl)"></span>Request terms<span class="cnt" data-cnt="mark.clue"></span></label>
+            <label class="on"><input type="checkbox" id="layer-fact" checked><span class="sw" style="background:var(--rose);border-bottom:2px wavy var(--wine)"></span>Checked facts &amp; image boxes<span class="cnt" data-cnt="mark.fact"></span></label>
+            <label class="on"><input type="checkbox" id="layer-note" checked><span class="sw" style="background:var(--tint);border-left:3px solid var(--wine)"></span>Paper notes<span class="cnt" data-cnt=".rd-note"></span></label>
+            <label class="on"><input type="checkbox" id="layer-trace" checked><span class="sw" style="border:1px dashed var(--wine)"></span>Trace lines<span class="cnt" data-cnt=".rd-trace"></span></label>
+          </div>
+        </div>
+        <div class="book" id="book">
+          <div class="leaves">
+            <div class="view" id="bookView" tabindex="0" aria-label="Report pages: use the arrow keys to turn them">
+              <article class="article show-clue show-fact show-note show-trace" id="article"><div id="articleBody"></div></article>
             </div>
-            <div class="card box">
-              <h5>Sections</h5>
-              <ul class="toc" id="toc"></ul>
-            </div>
-            <div class="card box">
-              <h5>Report gate</h5>
-              <ul class="gate-log" id="gateLog"></ul>
-              <p class="hint" style="margin:10px 0 0">Click a submission to scrub the trace to that turn.</p>
-            </div>
-          </aside>
+          </div>
+          <button type="button" class="turn prev" id="prevPage" aria-label="Previous page">&#8249;</button>
+          <button type="button" class="turn next" id="nextPage" aria-label="Next page">&#8250;</button>
+          <div class="book-foot">
+            <span class="pageno" id="pageNo"></span>
+            <span class="dots" id="pageDots" aria-hidden="true"></span>
+            <span class="keys">&larr; &rarr; keys or a swipe turn the page</span>
+          </div>
         </div>
       </div>
       </div>

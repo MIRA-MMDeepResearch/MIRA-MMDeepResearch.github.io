@@ -241,26 +241,25 @@ host.addEventListener('mouseover', e => {
 });
 host.addEventListener('mouseleave', () => { $$('td.hl-col, th.hl-col, tr.hl-row', host).forEach(x => x.classList.remove('hl-col', 'hl-row')); $$('.bar.hot', chartSvg).forEach(b => b.classList.remove('hot')); chartWrap.classList.remove('hovering'); });
 
-/* ---------- step figures: a frosted grey-red veil over the whole figure, with a hole over the current block ---------- */
+/* ---------- step figures: a frosted grey-red veil over the whole figure; a crisp lens shows the current block ----------
+   (clip-path does not clip backdrop-filter's blur in Chrome, so the hole is a second copy of the figure, clipped and laid over the veil) */
 function initSteps(key, listId, stageId, capId) {
-  const list = $(listId), stage = $(stageId), cap = $(capId), spot = $('.spot', stage), img = $('img', stage), steps = DATA.steps[key];
+  const list = $(listId), stage = $(stageId), cap = $(capId), spot = $('.spot', stage), lens = $('.lens', stage), copy = $('img', lens), img = $('img', stage), steps = DATA.steps[key];
   const rest = cap.textContent;
   list.innerHTML = steps.map((st, i) => `<li><button type="button" data-i="${i}" aria-pressed="false"><span class="n">${st.n ?? i + 1}</span><span><b>${st.t}</b><span>${st.d}</span></span></button></li>`).join('');
   let locked = null, showing = null;
   function hole(i) {
     const [x, y, w, h] = steps[i].box, ir = img.getBoundingClientRect(), pr = spot.getBoundingClientRect();
-    const ox = ir.left - pr.left, oy = ir.top - pr.top;
-    spot.style.setProperty('--x0', (ox + x / 100 * ir.width).toFixed(1) + 'px');
-    spot.style.setProperty('--x1', (ox + (x + w) / 100 * ir.width).toFixed(1) + 'px');
-    spot.style.setProperty('--y0', (oy + y / 100 * ir.height).toFixed(1) + 'px');
-    spot.style.setProperty('--y1', (oy + (y + h) / 100 * ir.height).toFixed(1) + 'px');
+    const ox = ir.left - pr.left, oy = ir.top - pr.top, px = v => v.toFixed(1) + 'px';
+    Object.assign(lens.style, { left: px(ox + x / 100 * ir.width), top: px(oy + y / 100 * ir.height), width: px(w / 100 * ir.width), height: px(h / 100 * ir.height) });
+    Object.assign(copy.style, { left: px(-x / 100 * ir.width), top: px(-y / 100 * ir.height), width: px(ir.width), height: px(ir.height) });
   }
   function show(i) {
     $$('button', list).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.i === i)));
     if (i == null) { showing = null; stage.classList.remove('on'); cap.textContent = rest; return; }
     const wasOff = showing == null;
     showing = i; hole(i);
-    if (wasOff) void spot.offsetWidth;   // the hole jumps into place while the veil is still invisible, then only the opacity fades in
+    if (wasOff) void lens.offsetWidth;   // the lens jumps into place while still invisible, then only the opacity fades in
     stage.classList.add('on'); cap.textContent = steps[i].long || steps[i].d;
   }
   list.addEventListener('mouseover', e => { const b = e.target.closest('button'); if (b) show(+b.dataset.i); });
@@ -276,25 +275,32 @@ function initSteps(key, listId, stageId, capId) {
 initSteps('harness', '#harnessSteps', '#harnessStage', '#harnessCap');
 initSteps('data', '#dataSteps', '#dataStage', '#dataCap');
 
-/* ---------- case study: three requests stacked like sheets; the tabs on the spine pull one to the front ---------- */
-const CASES = DATA.cases, MODES = ['concise', 'detail'];
+/* ---------- case study: the first request's run is replayed once; the deck below holds every report ---------- */
+const CASES = DATA.cases, MODES = ['concise', 'detail'], REPLAY = CASES[0];
 let cur = 0, CUR = CASES[0], curMode = 'concise', turning = false;
 const deck = $('#deck'), casePage = $('#casePage'), caseTabs = $('#caseTabs');
+function runTiles(c) {
+  return MODES.map(m => { const r = c.runs[m]; return `<div class="run"><span class="mode">${m}</span><span class="stat"><b>${r.calls}</b><small>calls</small></span><span class="stat"><b>${r.turns}</b><small>turns</small></span><span class="stat"><b>${r.secs}</b><small>s</small></span></div>`; }).join('');
+}
+$('#replayKicker').textContent = `Replay · request 1 of ${CASES.length}`;
+$('#replayTitle').textContent = REPLAY.title;
+$('#replayQ').textContent = '“' + REPLAY.question + '”';
+$('#replayRuns').innerHTML = runTiles(REPLAY);
 caseTabs.innerHTML = CASES.map((c, k) => `<button type="button" role="tab" data-k="${k}" aria-selected="${k === 0}"><span class="no">0${k + 1}</span>${c.tab}</button>`).join('');
 caseTabs.addEventListener('click', e => { const b = e.target.closest('button'); if (b) switchCase(+b.dataset.k); });
 function renderHead() {
   $('#caseKicker').textContent = CUR.kicker; $('#caseTitle').textContent = CUR.title;
   $('#caseQ').textContent = '“' + CUR.question + '”';
-  $('#caseRuns').innerHTML = MODES.map(m => { const r = CUR.runs[m]; return `<div class="run"><span class="mode">${m}</span><span class="stat"><b>${r.calls}</b><small>calls</small></span><span class="stat"><b>${r.turns}</b><small>turns</small></span><span class="stat"><b>${r.secs}</b><small>s</small></span></div>`; }).join('');
+  $('#caseRuns').innerHTML = runTiles(CUR);
   $$('button', caseTabs).forEach(b => b.setAttribute('aria-selected', String(+b.dataset.k === cur)));
 }
 
-/* ---------- trace timeline ---------- */
+/* ---------- trace timeline (first request only) ---------- */
 const KINDS = { search: ['Search', '#F3CDD0'], page: ['Open page', '#E59AA2'], image: ['Open image', '#C44C5B'], find: ['Find', '#A8303E'], python: ['Python', '#8B1F2C'], submit: ['Submit report', '#4F0C14'] };
 const traceSvg = $('#trace'), traceScroll = $('#traceScroll'), traceTip = $('#traceTip');
 let maxTurns = 1;
 function drawTrace() {
-  const TR = CUR.trace;
+  const TR = REPLAY.trace;
   maxTurns = Math.max(...MODES.map(m => TR[m].turns.length));
   const S = 13, G = 3, COLW = 2 * S + G, LEFT = 84, TOTW = 230;
   const PITCH = Math.max(31, Math.min(46, Math.floor((1180 - LEFT - 40 - TOTW) / maxTurns)));   // long runs pack their columns tighter
@@ -367,18 +373,17 @@ function unlit() { traceScroll.classList.remove('dim'); $$('.sq.lit, .turn-l.lit
 traceSvg.addEventListener('mouseover', e => {
   const sq = e.target.closest('.sq');
   if (sq) {
-    const c = CUR.trace[sq.dataset.mode].turns[sq.dataset.turn - 1][+sq.dataset.i];
+    const c = REPLAY.trace[sq.dataset.mode].turns[sq.dataset.turn - 1][+sq.dataset.i];
     const arg = c.a ? `<br><span class="m">${c.a.replace(/</g, '&lt;')}${c.a.length >= 80 ? '…' : ''}</span>` : '';
-    const sub = c.k === 'submit' ? CUR.trace[sq.dataset.mode].submissions[sq.dataset.turn] : null;
+    const sub = c.k === 'submit' ? REPLAY.trace[sq.dataset.mode].submissions[sq.dataset.turn] : null;
     const gate = sub ? `<br>${sub.accepted ? 'accepted by the report gate' : 'rejected: ' + sub.reason}` : '';
     placeTip(traceTip, traceScroll, $('rect', sq), `<b>${KINDS[c.k][0]}</b> · ${sq.dataset.mode} turn ${sq.dataset.turn}${arg}${gate}`);
     return;
   }
   const col = e.target.closest('.col-hit');
-  if (col) { $$('.turn-l', traceSvg).forEach(t => t.classList.toggle('lit', t.dataset.mode === col.dataset.mode && t.dataset.turn === col.dataset.turn)); litFigs(col.dataset.mode === curMode ? [+col.dataset.turn] : []); }
+  if (col) $$('.turn-l', traceSvg).forEach(t => t.classList.toggle('lit', t.dataset.mode === col.dataset.mode && t.dataset.turn === col.dataset.turn));
 });
-traceSvg.addEventListener('mouseout', e => { if (e.target.closest('.sq')) traceTip.classList.remove('on'); if (e.target.closest('.col-hit')) { $$('.turn-l.lit', traceSvg).forEach(t => t.classList.remove('lit')); litFigs([]); } });
-function litFigs(turns) { $$('.rd-fig').forEach(f => f.classList.toggle('lit', f.dataset.turns.split(',').some(t => turns.includes(+t)))); }
+traceSvg.addEventListener('mouseout', e => { if (e.target.closest('.sq')) traceTip.classList.remove('on'); if (e.target.closest('.col-hit')) $$('.turn-l.lit', traceSvg).forEach(t => t.classList.remove('lit')); });
 
 /* playback */
 const scrub = $('#scrub'), counter = $('#counter'), playBtn = $('#playBtn');
@@ -402,83 +407,139 @@ function play() {
   timer = setInterval(() => { t++; scrub.value = t; showTurns(t); if (t >= maxTurns) stop(); }, step);
 }
 playBtn.addEventListener('click', () => { if (timer) stop(); else play(); });
-function initTrace() { stop(); drawTrace(); scrub.max = maxTurns; scrub.value = maxTurns; showTurns(maxTurns); }
-
-/* ---------- report reader ---------- */
-const article = $('#article'), articleBody = $('#articleBody'), modeSwitch = $('#modeSwitch');
-['clue', 'fact', 'note', 'trace'].forEach(k => $('#layer-' + k).addEventListener('change', e => article.classList.toggle('show-' + k, e.target.checked)));
-function renderReport() {
-  const rep = CUR.report[curMode];
-  articleBody.innerHTML = rep.html;
-  modeSwitch.innerHTML = MODES.map(m => { const r = CUR.report[m]; return `<button type="button" role="tab" data-mode="${m}" aria-selected="${m === curMode}"><b>${m === 'concise' ? 'Concise' : 'Detail'} report</b><small>${r.images} image${r.images === 1 ? '' : 's'} · ${r.refs} source${r.refs === 1 ? '' : 's'}</small></button>`; }).join('');
-  $$('.layers .cnt').forEach(c => c.textContent = $$(c.dataset.cnt, article).length);
-  // gate log moves to the rail
-  const gateSec = $('.rd-gate', article);
-  $('#gateLog').innerHTML = gateSec ? $('ul', gateSec).innerHTML : '';
-  if (gateSec) gateSec.remove();
-  // table of contents
-  $$('.rd-sec', article).forEach((sec, i) => { sec.id = 'rd-sec-' + i; });
-  $('#toc').innerHTML = $$('.rd-sec', article).map(sec => { const h = $('h4', sec); return h ? `<li><a href="#${sec.id}">${h.textContent}</a></li>` : ''; }).join('');
-}
-modeSwitch.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.mode === curMode) return; curMode = b.dataset.mode; renderReport(); });
-$('#gateLog').addEventListener('click', e => {
-  const li = e.target.closest('li'); if (!li) return;
-  const t = +li.dataset.turn; stop(); scrub.value = t; showTurns(t);
-  litSquares(sq => sq.dataset.mode === curMode && +sq.dataset.turn === t);
-  traceScroll.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
-  setTimeout(unlit, 1800);
-});
-// citations <-> references
-article.addEventListener('mouseover', e => {
-  const c = e.target.closest('.cite'); if (c) { $$(`.rd-reflist li[data-ref="${c.dataset.ref}"]`, article).forEach(li => li.classList.add('lit')); return; }
-  const li = e.target.closest('.rd-reflist li'); if (li) { $$(`.cite[data-ref="${li.dataset.ref}"]`, article).forEach(x => x.classList.add('lit')); return; }
-  const ir = e.target.closest('.imgref'); if (ir) { const f = $(`#img-${ir.dataset.img}`); if (f) f.classList.add('lit'); return; }
-  const tr = e.target.closest('.rd-trace'); if (tr) { const turns = tr.dataset.turns.split(',').map(Number); litSquares(sq => sq.dataset.mode === curMode && turns.includes(+sq.dataset.turn)); $$('.turn-l', traceSvg).forEach(l => l.classList.toggle('lit', l.dataset.mode === curMode && turns.includes(+l.dataset.turn))); }
-});
-article.addEventListener('mouseout', e => {
-  if (e.target.closest('.cite, .rd-reflist li, .imgref')) $$('.lit', article).forEach(x => x.classList.remove('lit'));
-  if (e.target.closest('.rd-trace')) unlit();
-});
-article.addEventListener('click', e => {
-  const a = e.target.closest('a.cite, a.imgref');
-  if (a) {
-    e.preventDefault();
-    const t = $(a.getAttribute('href')); if (!t) return;
-    t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
-    t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
-    if (a.classList.contains('imgref')) { t.classList.add('lit'); setTimeout(() => t.classList.remove('lit'), 1600); }
-    return;
-  }
-  const refn = e.target.closest('.rd-reflist li .rd-refn');
-  if (refn) { const n = refn.closest('li').dataset.ref, first = $(`.cite[data-ref="${n}"]`, article); if (first) { first.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); first.classList.add('lit'); setTimeout(() => first.classList.remove('lit'), 1600); } return; }
-  const tr = e.target.closest('.rd-trace'); if (tr) { tr.classList.toggle('open'); return; }
-  const iw = e.target.closest('.rd-imgwrap');
-  if (iw) { const img = $('img', iw), fig = iw.closest('figure'); openLightbox(img.src, img.alt, $('figcaption', fig).textContent, $$('.rd-box', iw).map(b => b.outerHTML).join('')); }
-});
-
-/* ---------- switching cases ---------- */
-function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); initTrace(); renderReport(); }
-function switchCase(k) {
-  if (k === cur || turning) return;
-  const top = deck.getBoundingClientRect().top;
-  if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes height
-  if (reduce) { loadCase(k); return; }
-  turning = true; casePage.classList.add('out');
-  setTimeout(() => {
-    loadCase(k);
-    casePage.classList.remove('out'); casePage.classList.add('in'); void casePage.offsetWidth; casePage.classList.remove('in');
-    setTimeout(() => { turning = false; play(); }, 460);
-  }, 240);
-}
-loadCase(0);
-/* the replay starts by itself when the trace scrolls into view (twice per visit at most), so nobody has to find the button */
+drawTrace(); scrub.max = maxTurns; scrub.value = maxTurns; showTurns(maxTurns);
+/* the replay starts by itself when it scrolls into view (twice per visit at most), so nobody has to find the button */
 if (!reduce) {
   let autoPlays = 0, armed = true;
   new IntersectionObserver(ens => ens.forEach(en => {
     if (en.intersectionRatio >= .45 && armed && autoPlays < 2) { armed = false; autoPlays++; setTimeout(() => { if (!timer) play(); }, 250); }
     else if (!en.isIntersecting && !armed) { armed = true; }
-  }), { threshold: [0, .45] }).observe($('.trace-card'));
+  }), { threshold: [0, .45] }).observe($('#replay'));
 }
+
+/* ---------- the book: the report flows through fixed-height columns; a view shows one or two of them, and turning a page slides the next ones in ---------- */
+const article = $('#article'), articleBody = $('#articleBody'), modeSwitch = $('#modeSwitch');
+const book = $('#book'), view = $('#bookView'), pageNo = $('#pageNo'), pageDots = $('#pageDots'), prevBtn = $('#prevPage'), nextBtn = $('#nextPage');
+const secMenu = $('#secMenu'), gateMenu = $('#gateMenu'), toc = $('#toc');
+let pg = 0, pages = 1, ncol = 2, colw = 0, GAP = 48;
+function measure() {
+  const w = view.clientWidth;
+  GAP = parseFloat(getComputedStyle(book).getPropertyValue('--book-gap')) || 48;
+  ncol = w >= 860 ? 2 : 1;
+  article.style.columnCount = ncol;
+  colw = (w - (ncol - 1) * GAP) / ncol;
+  article.style.setProperty('--pg-w', (w + GAP) + 'px');
+  const a = article.getBoundingClientRect(); let right = 0;   // the furthest fragment decides how many columns the report filled
+  $$('#articleBody *').forEach(el => { const r = el.getBoundingClientRect(); if (r.width || r.height) right = Math.max(right, r.right - a.left); });
+  const cols = Math.max(1, Math.floor((right - 1) / (colw + GAP)) + 1);
+  pages = Math.max(1, Math.ceil(cols / ncol));
+}
+function pageOf(el) {
+  const left = el.getBoundingClientRect().left - article.getBoundingClientRect().left;
+  return Math.max(0, Math.min(pages - 1, Math.floor(Math.floor((left + 2) / (colw + GAP)) / ncol)));
+}
+function paint() {
+  article.style.setProperty('--pg', pg);
+  pageNo.textContent = `Page ${pg + 1} of ${pages}`;
+  prevBtn.disabled = pg === 0; nextBtn.disabled = pg >= pages - 1;
+  pageDots.innerHTML = pages <= 18 ? Array.from({ length: pages }, (_, i) => `<button type="button" data-p="${i}"${i === pg ? ' class="on"' : ''} aria-label="Page ${i + 1}"></button>`).join('') : '';
+  let on = null; $$('a', toc).forEach(a => { if (+a.dataset.p <= pg) on = a; a.classList.remove('on'); }); if (on) on.classList.add('on');
+}
+function go(n) { pg = Math.max(0, Math.min(pages - 1, n)); paint(); }
+function reflow(keep) {
+  article.classList.add('jump');   // re-measuring must not animate
+  measure();
+  $$('a', toc).forEach(a => { const sec = $('#' + a.dataset.sec); a.dataset.p = sec ? pageOf(sec) : 0; $('small', a).textContent = 'p. ' + (+a.dataset.p + 1); });
+  pg = keep ? pageOf(keep) : Math.min(pg, pages - 1);
+  paint();
+  void article.offsetWidth;
+  article.classList.remove('jump');
+}
+let reflowTimer = null;
+function scheduleReflow() { clearTimeout(reflowTimer); reflowTimer = setTimeout(() => reflow(), 60); }
+prevBtn.addEventListener('click', () => go(pg - 1));
+nextBtn.addEventListener('click', () => go(pg + 1));
+pageDots.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(+b.dataset.p); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  if (/^(input|textarea|select)$/i.test(document.activeElement.tagName)) return;
+  if (!book.matches(':hover') && !book.contains(document.activeElement)) return;
+  e.preventDefault(); go(pg + (e.key === 'ArrowRight' ? 1 : -1));
+});
+let swipe = null;
+view.addEventListener('pointerdown', e => { swipe = e.pointerType === 'mouse' ? null : { x: e.clientX, y: e.clientY }; });
+view.addEventListener('pointerup', e => { if (!swipe) return; const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y; swipe = null; if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) go(pg + (dx < 0 ? 1 : -1)); });
+let wheelAcc = 0, wheelLock = false;
+view.addEventListener('wheel', e => {   // a horizontal trackpad swipe turns the page; vertical scrolling passes through
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 6) return;
+  e.preventDefault();
+  if (wheelLock) return;
+  wheelAcc += e.deltaX;
+  if (Math.abs(wheelAcc) > 60) { go(pg + (wheelAcc > 0 ? 1 : -1)); wheelAcc = 0; wheelLock = true; setTimeout(() => { wheelLock = false; wheelAcc = 0; }, 700); }
+}, { passive: false });
+view.addEventListener('scroll', () => { view.scrollLeft = 0; view.scrollTop = 0; });   // focus or anchors must never shift the hidden overflow
+addEventListener('resize', () => { clearTimeout(reflowTimer); reflowTimer = setTimeout(() => reflow(), 120); });
+if (document.fonts) document.fonts.ready.then(scheduleReflow);
+document.addEventListener('click', e => { [secMenu, gateMenu].forEach(m => { if (m.open && !m.contains(e.target)) m.open = false; }); });
+
+/* ---------- report reader ---------- */
+['clue', 'fact', 'note', 'trace'].forEach(k => { const cb = $('#layer-' + k); cb.addEventListener('change', () => { article.classList.toggle('show-' + k, cb.checked); cb.closest('label').classList.toggle('on', cb.checked); reflow(); }); });
+function renderReport() {
+  const rep = CUR.report[curMode];
+  articleBody.innerHTML = rep.html;
+  modeSwitch.innerHTML = MODES.map(m => { const r = CUR.report[m]; return `<button type="button" role="tab" data-mode="${m}" aria-selected="${m === curMode}"><b>${m === 'concise' ? 'Concise' : 'Detail'} report</b><small>${r.images} image${r.images === 1 ? '' : 's'} · ${r.refs} source${r.refs === 1 ? '' : 's'}</small></button>`; }).join('');
+  $$('.chips .cnt').forEach(c => c.textContent = $$(c.dataset.cnt, article).length);
+  // the gate log moves out of the report into its menu
+  const gateSec = $('.rd-gate', article), gateItems = gateSec ? $$('li', gateSec).length : 0;
+  $('#gateLog').innerHTML = gateSec ? $('ul', gateSec).innerHTML : '<li>No gate record for this run.</li>';
+  $('#gateSum').textContent = gateItems ? `Report gate · ${gateItems} draft${gateItems === 1 ? '' : 's'}` : 'Report gate';
+  if (gateSec) gateSec.remove();
+  // table of contents
+  $$('.rd-sec', article).forEach((sec, i) => { sec.id = 'rd-sec-' + i; });
+  toc.innerHTML = $$('.rd-sec', article).map(sec => { const h = $('h4', sec); return h ? `<li><a href="#${sec.id}" data-sec="${sec.id}" data-p="0">${h.textContent}<small></small></a></li>` : ''; }).join('');
+  secMenu.open = false; gateMenu.open = false;
+  $$('img', articleBody).forEach(im => { if (!im.complete) im.addEventListener('load', scheduleReflow, { once: true }); });
+  pg = 0; reflow();
+}
+modeSwitch.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.mode === curMode) return; curMode = b.dataset.mode; renderReport(); });
+toc.addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); go(+a.dataset.p); secMenu.open = false; view.focus({ preventScroll: true }); });
+// citations <-> references
+article.addEventListener('mouseover', e => {
+  const c = e.target.closest('.cite'); if (c) { $$(`.rd-reflist li[data-ref="${c.dataset.ref}"]`, article).forEach(li => li.classList.add('lit')); return; }
+  const li = e.target.closest('.rd-reflist li'); if (li) { $$(`.cite[data-ref="${li.dataset.ref}"]`, article).forEach(x => x.classList.add('lit')); return; }
+  const ir = e.target.closest('.imgref'); if (ir) { const f = $(`#img-${ir.dataset.img}`); if (f) f.classList.add('lit'); }
+});
+article.addEventListener('mouseout', e => { if (e.target.closest('.cite, .rd-reflist li, .imgref')) $$('.lit', article).forEach(x => x.classList.remove('lit')); });
+function flashTo(t, lit) {
+  go(pageOf(t));
+  t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+  if (lit) { t.classList.add('lit'); setTimeout(() => t.classList.remove('lit'), 1600); }
+}
+article.addEventListener('click', e => {
+  const a = e.target.closest('a.cite, a.imgref');
+  if (a) { e.preventDefault(); const t = $(a.getAttribute('href')); if (t) flashTo(t, a.classList.contains('imgref')); return; }
+  const refn = e.target.closest('.rd-reflist li .rd-refn');
+  if (refn) { const first = $(`.cite[data-ref="${refn.closest('li').dataset.ref}"]`, article); if (first) flashTo(first, true); return; }
+  const tr = e.target.closest('.rd-trace'); if (tr) { tr.classList.toggle('open'); reflow(tr.closest('figure') || tr); return; }
+  const iw = e.target.closest('.rd-imgwrap');
+  if (iw) { const img = $('img', iw), fig = iw.closest('figure'); openLightbox(img.src, img.alt, $('figcaption', fig).textContent, $$('.rd-box', iw).map(b => b.outerHTML).join('')); }
+});
+
+/* ---------- switching requests ---------- */
+function loadCase(k) { cur = k; CUR = CASES[k]; curMode = 'concise'; renderHead(); renderReport(); }
+function switchCase(k) {
+  if (k === cur || turning) return;
+  const top = deck.getBoundingClientRect().top;
+  if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes
+  if (reduce) { loadCase(k); return; }
+  turning = true; casePage.classList.add('out');
+  setTimeout(() => {
+    loadCase(k);
+    casePage.classList.remove('out'); casePage.classList.add('in'); void casePage.offsetWidth; casePage.classList.remove('in');
+    setTimeout(() => { turning = false; }, 460);
+  }, 240);
+}
+loadCase(0);
 
 /* ---------- lightbox ---------- */
 const lb = $('#lb'), lbImg = $('#lbImg'), lbPan = $('#lbPan'), lbBoxes = $('#lbBoxes'), lbCap = $('#lbCap');
