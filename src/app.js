@@ -465,8 +465,8 @@ let pg = 0, pages = 1, ncol = 2, colw = 0, GAP = 48;
 function offX(el) { let x = 0; for (let e = el; e && e !== article; e = e.offsetParent) x += e.offsetLeft; return x; }   // layout position inside the article: exact in multicol, unaffected by the deck's transition transforms
 function measure() {
   const w = parseFloat(getComputedStyle(view).width);   // fractional: the integer clientWidth would drift the pages by up to half a pixel each
-  GAP = parseFloat(getComputedStyle(book).getPropertyValue('--book-gap')) || 48;
-  ncol = w >= 860 ? 2 : 1;
+  GAP = parseFloat(getComputedStyle(article).columnGap) || 48;   // the resolved gap: --book-gap itself is a calc() scaled by --k
+  ncol = w >= 860 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--k')) || 1) ? 2 : 1;
   article.style.columnCount = ncol;
   colw = (w - (ncol - 1) * GAP) / ncol;
   article.style.setProperty('--pg-w', (w + GAP) + 'px');

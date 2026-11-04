@@ -135,6 +135,28 @@ assert '</script' not in js
 body = open(os.path.join(SRC, 'body.html'), encoding='utf-8').read()
 assert '{{' not in body
 head = open(os.path.join(SRC, 'head.html'), encoding='utf-8').read()
+
+
+# desktop scale: every length in a declaration block becomes calc(Npx * var(--k)); --k is 1, and .85 from 1100px up (see head.html).
+# Media query conditions sit outside the blocks and keep their px; so do 0-2px hairlines, and the text sizes of SVG rules (a rule with a
+# fill), which already scale with their viewBox
+PX = re.compile(r'(?<![\w.])(-?\d*\.?\d+)px\b')
+
+
+def scale_block(m):
+    block = m.group(0)
+    svg = 'fill:' in block
+
+    def one(n):
+        if abs(float(n.group(1))) <= 2 or (svg and re.search(r'font-size:\s*$', block[:n.start()])):
+            return n.group(0)
+        return 'calc(%spx * var(--k))' % n.group(1)
+    return PX.sub(one, block)
+
+
+a, b = head.index('<style>'), head.index('</style>')
+assert head.count('<style>') == 1 and head[a:b].count('{') == head[a:b].count('}')
+head = head[:a] + re.sub(r'\{[^{}]*\}', scale_block, head[a:b]) + head[b:]
 for name in sorted(os.listdir(os.path.join(ASSETS, 'img'))):      # the mascot's mask layers travel inside the stylesheet
     if name.startswith('wm_') and name.endswith('.png'):
         ref = 'url("assets/img/%s")' % name

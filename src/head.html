@@ -74,7 +74,10 @@ p, li, dd, .rd-note { text-wrap: pretty; }
 h1, h2, h3, h4, h5, figcaption { text-wrap: balance; }
 p, .hint, .caption, .steps .list span, .stage-foot span, .tbl-tools span { text-wrap: pretty; }   /* running text wraps at the right edge; only the last lines are tidied */
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-@media (min-width: 1100px) { html { font-size: 15px; } }
+/* --k scales every length in this sheet (tools/build.py writes each Npx as calc(Npx * var(--k))): a desktop shows the page at 85%, the way a
+   browser does at 85% zoom, so more of it fits on one screen; phones and tablets keep 1 */
+:root { --k: 1; }
+@media (min-width: 1100px) { :root { --k: .85; } html { font-size: 15px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 body {
   margin: 0; background: var(--bg); color: var(--fg);
@@ -203,7 +206,9 @@ body[data-look="paper"] .topbar { background: var(--card-solid); }
 .secnav a.on i { border-color: var(--red); box-shadow: 0 0 0 5px var(--rose); }
 .secnav a.on { color: var(--wine); } .secnav a:hover { color: var(--fg); }
 .secnav .t { writing-mode: vertical-rl; }
-@media (min-width: 1100px) { .secnav { display: flex; flex-direction: column; align-items: center; }   /* the logo centres on the dots-and-labels column */ .topbar nav { display: none; } .wrap { max-width: min(1240px, 100% - 100px); } .wide { max-width: min(1240px, 100% - 100px); } }
+/* the rail sits just left of the column (half the column, less its 16px padding, plus a 26px gap), not at the screen edge; on a narrow
+   desktop it stops 10px from the edge, and the column keeps 80px each side clear for it */
+@media (min-width: 1100px) { .secnav { display: flex; flex-direction: column; align-items: center; left: auto; right: min(calc(50% + min(620px, 50% - 80px) + 10px), calc(100% - 66px)); }   /* the logo centres on the dots-and-labels column */ .topbar nav { display: none; } .wrap { max-width: min(1240px, 100% - 160px); } .wide { max-width: min(1240px, 100% - 160px); } }
 @media (max-width: 1500px) { table.results th, table.results td { padding: 9px 6px; } table.results thead th { font-size: .84rem; } }
 @media (min-width: 1720px) { .secnav .t { writing-mode: horizontal-tb; } .secnav ol { gap: 22px; } }
 .topbar nav::-webkit-scrollbar { display: none; }
