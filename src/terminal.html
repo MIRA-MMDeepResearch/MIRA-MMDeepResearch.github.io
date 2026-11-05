@@ -13,7 +13,12 @@
 .term { position: relative; border-radius: 16px; overflow: hidden; color: var(--t-fg); font: 13px/1.6 var(--font-mono);
   background: radial-gradient(110% 90% at 0% 0%, rgba(218,41,28,.22), transparent 58%), linear-gradient(160deg, var(--t-bg-2) 0%, var(--t-bg) 62%);
   box-shadow: 0 34px 80px -42px rgba(90,10,20,.7), inset 0 0 0 1px var(--t-line); }
-.bar { display: flex; align-items: center; gap: 12px; padding: 9px 12px 9px 14px; border-bottom: 1px solid var(--t-line); background: rgba(0,0,0,.22); }
+.bar { position: relative; display: flex; align-items: center; gap: 12px; padding: 9px 12px 9px 14px; border-bottom: 1px solid var(--t-line); background: rgba(0,0,0,.22); }
+/* how far this run's replay has got, so a reader can see when it ends: a line along the bar's lower edge and the time beside the run buttons */
+.prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: rgba(255,214,219,.1); overflow: hidden; }
+.prog i { display: block; height: 100%; background: linear-gradient(90deg, #DA291C, var(--t-red)); transform: scaleX(0); transform-origin: left; transition: transform .12s linear; }
+.bar .clock { margin-left: auto; flex: none; font: 500 11.5px/1 var(--font-mono); color: var(--t-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar .clock + .runs { margin-left: 0; }
 .lights { display: flex; gap: 7px; flex: none; }
 .lights i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57; } .lights i:nth-child(2) { background: #FEBC2E; } .lights i:nth-child(3) { background: #28C840; }
 .bar .name { color: var(--t-dim); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -227,8 +232,10 @@
     <div class="bar">
       <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="name">mira — MIRA-Harness — recorded runs</span>
+      <span class="clock" id="tclock" aria-hidden="true"></span>
       <div class="runs" id="runs" role="group" aria-label="Run"></div>
       <button type="button" class="again" id="again" aria-label="Replay this run" title="Replay this run">&#8635;</button>
+      <i class="prog" aria-hidden="true"><i id="progFill"></i></i>
     </div>
     <div class="screen">
       <div class="welcome">

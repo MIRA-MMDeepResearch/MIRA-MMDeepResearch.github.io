@@ -189,6 +189,8 @@ body[data-look="editorial"] .brand { color: #FFD2D6; }
 .authors span, .affils span { display: inline-block; white-space: nowrap; margin: 2px calc(10px * var(--k)); }
 .authors .row, .affils .row { display: block; margin: 0; white-space: normal; }   /* five names, then three affiliations, per line */
 .authors { font-size: 1.02rem; }
+.authors a.home { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: calc(4px * var(--k)); text-decoration-color: color-mix(in srgb, currentColor 60%, transparent); transition: text-decoration-color .2s; }   /* the first author links to their homepage */
+.authors a.home:hover { text-decoration-color: currentColor; }
 .affils, .notes { color: var(--hero-muted); font-size: .9rem; }
 .notes { margin: calc(4px * var(--k)) 0 0; font-size: .84rem; }
 sup { font-size: .68em; }
@@ -623,7 +625,7 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
   <div class="wrap hero-in">
     <h1 class="title"><span class="tl"><span class="brand">MIRA</span>: A Multimodal Illustrated</span> <span class="tl">Deep Research Agent for Controllable Reports</span></h1>
     <p class="authors">
-      <span class="row"><span>Hongrui Wu<sup>1,3,*</sup></span><span>Kaiwen Tuo<sup>2,*</sup></span><span>Congcong Wang<sup>3,*</sup></span><span>Gen Li<sup>3</sup></span><span>Shuai Dong<sup>4</sup></span></span>
+      <span class="row"><span><a class="home" href="https://onehfr.github.io/">Hongrui Wu</a><sup>1,3,*</sup></span><span>Kaiwen Tuo<sup>2,*</sup></span><span>Congcong Wang<sup>3,*</sup></span><span>Gen Li<sup>3</sup></span><span>Shuai Dong<sup>4</sup></span></span>
       <span class="row"><span>Xinlei Yu<sup>5</sup></span><span>Yuqi Xu<sup>3</sup></span><span>Haowen Hou<sup>6</sup></span><span>Zelin Peng<sup>3</sup></span><span>Jiaqi Wang<sup>3,&dagger;</sup></span></span>
     </p>
     <p class="affils">
@@ -659,7 +661,12 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
 .term { position: relative; border-radius: calc(16px * var(--k)); overflow: hidden; color: var(--t-fg); font: calc(13px * var(--k))/1.6 var(--font-mono);
   background: radial-gradient(110% 90% at 0% 0%, rgba(218,41,28,.22), transparent 58%), linear-gradient(160deg, var(--t-bg-2) 0%, var(--t-bg) 62%);
   box-shadow: 0 calc(34px * var(--k)) calc(80px * var(--k)) calc(-42px * var(--k)) rgba(90,10,20,.7), inset 0 0 0 1px var(--t-line); }
-.bar { display: flex; align-items: center; gap: calc(12px * var(--k)); padding: calc(9px * var(--k)) calc(12px * var(--k)) calc(9px * var(--k)) calc(14px * var(--k)); border-bottom: 1px solid var(--t-line); background: rgba(0,0,0,.22); }
+.bar { position: relative; display: flex; align-items: center; gap: calc(12px * var(--k)); padding: calc(9px * var(--k)) calc(12px * var(--k)) calc(9px * var(--k)) calc(14px * var(--k)); border-bottom: 1px solid var(--t-line); background: rgba(0,0,0,.22); }
+/* how far this run's replay has got, so a reader can see when it ends: a line along the bar's lower edge and the time beside the run buttons */
+.prog { position: absolute; left: 0; right: 0; bottom: -1px; height: calc(3px * var(--k)); background: rgba(255,214,219,.1); overflow: hidden; }
+.prog i { display: block; height: 100%; background: linear-gradient(90deg, #DA291C, var(--t-red)); transform: scaleX(0); transform-origin: left; transition: transform .12s linear; }
+.bar .clock { margin-left: auto; flex: none; font: 500 calc(11.5px * var(--k))/1 var(--font-mono); color: var(--t-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar .clock + .runs { margin-left: 0; }
 .lights { display: flex; gap: calc(7px * var(--k)); flex: none; }
 .lights i { width: calc(11px * var(--k)); height: calc(11px * var(--k)); border-radius: 50%; background: #FF5F57; } .lights i:nth-child(2) { background: #FEBC2E; } .lights i:nth-child(3) { background: #28C840; }
 .bar .name { color: var(--t-dim); font-size: calc(12px * var(--k)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -873,8 +880,10 @@ main { padding-bottom: clamp(calc(70px * var(--k)), 10vh, calc(120px * var(--k))
     <div class="bar">
       <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="name">mira — MIRA-Harness — recorded runs</span>
+      <span class="clock" id="tclock" aria-hidden="true"></span>
       <div class="runs" id="runs" role="group" aria-label="Run"></div>
       <button type="button" class="again" id="again" aria-label="Replay this run" title="Replay this run">&#8635;</button>
+      <i class="prog" aria-hidden="true"><i id="progFill"></i></i>
     </div>
     <div class="screen">
       <div class="welcome">
@@ -1135,17 +1144,48 @@ function attract() {
   let token = 0, paused = { away: true, hidden: document.hidden }, instant = false;   // it plays only while on screen
   const isPaused = () => paused.away || paused.hidden;
   class Stop extends Error {}
-  function step(ms, my) {
-    if (instant) return Promise.resolve();
+  let played = 0, total = 1;   // ms of this run's replay so far and in all, for the progress line under the title bar
+  const dur = ms => Math.max(Math.min(40, ms), ms / SPEED);   // how long step(ms) takes on screen: its first look comes after min(40, ms)
+  function step(ms, my, count = true) {   // count = false for waits that are not part of the run (a reader holding the report card)
+    const from = played, d = dur(ms);
+    if (instant) { if (count) played = from + d; return Promise.resolve(); }
     return new Promise((res, rej) => {
-      let left = ms / SPEED, last = performance.now();
+      let left = ms / SPEED, last = performance.now(), gone = 0;
       const tick = () => {
         if (my !== token) return rej(new Stop());
-        const now = performance.now(); if (!isPaused()) left -= now - last; last = now;
+        const now = performance.now(); if (!isPaused()) { left -= now - last; gone += now - last; } last = now;
+        if (count) played = from + Math.min(d, left <= 0 ? d : gone);
         if (left <= 0) res(); else setTimeout(tick, Math.min(40, left));
       };
       setTimeout(tick, Math.min(40, ms));
     });
+  }
+
+  /* ---------- pacing: every wait in a run, in ms at speed 1. runMs adds them up the way typeRequest and play spend them, so the
+     progress line knows the run's length before it starts ---------- */
+  const W = { boot: 900, key1: 650, key: 130, pick: 450, space: 350, char: 26, paste: 260, sent: 900,
+    think: 420, call: 200, callImg: 260, res: 240, resImg: 420, fold: 90, foldImg: 230, gate: 1100, ok: 1500, warn: 3200, card: 6400, fade: 700 };
+  const typedHead = () => narrow() ? 38 : 64, shownCalls = () => narrow() ? 2 : 3;   // the rest of the request is pasted; the rest of a turn's calls fold
+  function runMs(run) {
+    const show = shownCalls();
+    let ms = dur(W.boot) + dur(W.key1) + (run.cmd.slice(0, 4).length - 1) * dur(W.key) + dur(W.pick) + dur(W.space)
+      + Math.min(run.q.length, typedHead()) * dur(W.char) + dur(W.paste) + dur(W.sent);
+    run.turns.forEach(turn => {
+      ms += dur(W.think);
+      turn.calls.forEach((c, i) => {
+        const img = c.k === 'image';
+        if (c.k === 'submit') ms += dur(W.gate) + dur(c.ok ? W.ok : W.warn);
+        else if (i < show || turn.calls.length <= show + 1) ms += dur(img ? W.callImg : W.call) + dur(img ? W.resImg : W.res);
+        else ms += dur(img ? W.foldImg : W.fold);
+      });
+    });
+    return ms + dur(W.card) + dur(W.fade);
+  }
+  const progFill = q('#progFill'), tclock = q('#tclock');
+  const mmss = s => { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  function drawProg() {
+    progFill.style.transform = `scaleX(${Math.min(1, played / total)})`;
+    tclock.textContent = `${mmss(played / 1000)} / ${mmss(total / 1000)}`;
   }
 
   /* ---------- status line: spinner, verb, turn, calls, recorded clock ---------- */
@@ -1158,7 +1198,7 @@ function attract() {
     stl.append(spin, ' ', el('span', 'verb', st.verb + (st.done ? '' : '…')));
     if (st.turns) stl.append(` · turn ${st.turn}/${st.turns} · ${st.calls} calls · ${clock(st.secs)}`);
   }
-  setInterval(() => { if (!isPaused() && !st.done) { frame++; drawStatus(); } }, 90);
+  setInterval(() => { if (isPaused()) return; drawProg(); if (!st.done) { frame++; drawStatus(); } }, 90);
 
   /* ---------- the dog: 17 × 9 blocks, drawn as rectangles [x, y, w, h, colour] ---------- */
   const JOY = {
@@ -1243,17 +1283,17 @@ function attract() {
     menu.classList.add('on');
   }
   async function typeRequest(run, my) {
-    renderPrompt('', '', '', true); await step(900, my);
+    renderPrompt('', '', '', true); await step(W.boot, my);
     const target = run.cmd, key = target.slice(0, 4);   // "/con" or "/det" is enough to pick the command
-    for (let i = 1; i <= key.length; i++) { renderPrompt('', target.slice(0, i), '', true); showMenu(target.slice(0, i)); await step(i === 1 ? 650 : 130, my); }
-    await step(450, my);
-    menu.classList.remove('on'); renderPrompt(target + ' ', '', '', true); await step(350, my);
-    const head = run.q.slice(0, narrow() ? 38 : 64), rest = run.q.slice(head.length);
-    for (let i = 1; i <= head.length; i++) { renderPrompt(target + ' ', head.slice(0, i), '', true); await step(26, my); }
-    await step(260, my);
+    for (let i = 1; i <= key.length; i++) { renderPrompt('', target.slice(0, i), '', true); showMenu(target.slice(0, i)); await step(i === 1 ? W.key1 : W.key, my); }
+    await step(W.pick, my);
+    menu.classList.remove('on'); renderPrompt(target + ' ', '', '', true); await step(W.space, my);
+    const head = run.q.slice(0, typedHead()), rest = run.q.slice(head.length);
+    for (let i = 1; i <= head.length; i++) { renderPrompt(target + ' ', head.slice(0, i), '', true); await step(W.char, my); }
+    await step(W.paste, my);
     renderPrompt(target + ' ', head, rest, true);   // the rest of the request arrives as a paste
     requestAnimationFrame(() => q('.paste', ptext)?.classList.add('settled'));
-    await step(900, my);
+    await step(W.sent, my);
     renderPrompt('', '', '', false, true);
   }
 
@@ -1347,17 +1387,18 @@ function attract() {
     log.classList.remove('fade'); log.textContent = ''; report.classList.remove('on'); menu.classList.remove('on');
     resetMeters(c); evReset(); mood('idle');
     st = { verb: 'Ready', turn: 0, turns: 0, calls: 0, secs: 0, done: false }; drawStatus();
+    played = 0; total = runMs(run); drawProg();
     await typeRequest(run, my);
     const u = line('u'); u.append(el('span', 'cmd', run.cmd), ' ' + run.q);
     line('sys', elbow(), `contract · ${fmt(c.min_chars)}–${fmt(c.max_chars)} chars · ≥${c.min_images} inspected images · ≥${c.min_sources} opened sources · ${run.repairs} repairs allowed`);
     const imgs = new Set(), pages = new Set();
-    const show = narrow() ? 2 : 3;
+    const show = shownCalls();
     st.turns = run.turns.length;
     for (let t = 0; t < run.turns.length; t++) {
       const turn = run.turns[t], perCall = turn.calls.length ? (turn.secs - turn.think) / turn.calls.length : 0;
       st.turn = t + 1; st.verb = 'Thinking'; mood('think'); drawStatus();
       const th = line('think'); th.append(el('span', 'star', '✻ '), `Thought for ${turn.think}s`);
-      st.secs += turn.think; await step(420, my);
+      st.secs += turn.think; await step(W.think, my);
       let fold = null, folded = { n: 0, kinds: {}, imgs: 0, errs: 0 };
       for (let i = 0; i < turn.calls.length; i++) {
         const call = turn.calls[i];
@@ -1373,23 +1414,23 @@ function attract() {
           const e = callLine(call); e.querySelector('.arg').textContent = `${call.a} · ${fmt(k.chars)} chars · ${k.examined_images_cited} images · ${k.opened_sources_cited} sources`;
           const span = c.max_chars - c.min_chars;
           setMeter('chars', (k.chars - c.min_chars) / span, `${fmt(k.chars)} <small>/ ${fmt(c.min_chars)}–${fmt(c.max_chars)}</small>`, k.chars >= c.min_chars && k.chars <= c.max_chars ? 'met' : 'bad');
-          await step(1100, my);
+          await step(W.gate, my);
           const res = gateBox(call, run); evGate(call);
           setMeter('images', k.examined_images_cited / c.min_images, `${k.examined_images_cited} cited <small>/ ≥${c.min_images}</small>`, res.imgBad ? 'bad' : 'met');
           setMeter('sources', k.accessible_references / c.min_sources, `${k.accessible_references}/${k.opened_sources_cited} reachable <small>/ ≥${c.min_sources}</small>`, res.refBad ? 'bad' : 'met');
-          if (call.ok) { st.verb = 'Writing report.md'; mood('happy', '✓', 'ok'); drawStatus(); await step(1500, my); }
-          else { st.verb = 'Fixing what the gate flagged'; mood('warn', '!', 'warn'); drawStatus(); await step(3200, my); mood('think'); }
+          if (call.ok) { st.verb = 'Writing report.md'; mood('happy', '✓', 'ok'); drawStatus(); await step(W.ok, my); }
+          else { st.verb = 'Fixing what the gate flagged'; mood('warn', '!', 'warn'); drawStatus(); await step(W.warn, my); mood('think'); }
           continue;
         }
         if (i < show || turn.calls.length <= show + 1) {
-          callLine(call); await step(call.k === 'image' ? 260 : 200, my);
-          resultLine(call, run); await step(call.k === 'image' ? 420 : 240, my);
+          callLine(call); await step(call.k === 'image' ? W.callImg : W.call, my);
+          resultLine(call, run); await step(call.k === 'image' ? W.resImg : W.res, my);
         } else {
           folded.n++; folded.kinds[call.k] = (folded.kinds[call.k] || 0) + 1; if (call.k === 'image') folded.imgs++; if (call.err) folded.errs++;
           if (!fold) fold = line('fold');
           const what = Object.entries(folded.kinds).map(([k, n]) => `${k === 'image' ? 'open(id=…)' : k === 'page' ? 'open' : k} ×${n}`).join(', ');
           fold.textContent = ''; fold.append(el('span', 'el', '⋯ '), el('span', 'n', `${folded.n} more`), ` · ${what}` + (folded.imgs ? ` · ${folded.imgs} image${folded.imgs > 1 ? 's' : ''} inspected` : '') + (folded.errs ? ` · ${folded.errs} tool error${folded.errs > 1 ? 's' : ''}` : ''));
-          await step(call.k === 'image' ? 230 : 90, my);
+          await step(call.k === 'image' ? W.foldImg : W.fold, my);
         }
       }
     }
@@ -1397,10 +1438,10 @@ function attract() {
     line('done', `✓ report.md delivered · ${fmt(run.final.chars)} chars · ${run.final.examined_images_cited} images · ${run.final.opened_sources_cited} sources · ${run.turns.length} turns · ${run.calls} calls · ${clock(run.secs)} recorded`);
     mood('happy', '✓', 'ok');
     showReport(key, run);
-    await step(6400, my);
-    while (cardHeld) await step(200, my);   // a reader on the card keeps it up
+    await step(W.card, my);
+    while (cardHeld) await step(200, my, false);   // a reader on the card keeps it up
     report.classList.remove('on'); log.classList.add('fade'); mood('idle');
-    await step(700, my);
+    await step(W.fade, my);
   }
 
   /* ---------- loop, run buttons, pausing ---------- */
