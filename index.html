@@ -189,8 +189,8 @@ body[data-look="editorial"] .brand { color: #FFD2D6; }
 .authors span, .affils span { display: inline-block; white-space: nowrap; margin: 2px calc(10px * var(--k)); }
 .authors .row, .affils .row { display: block; margin: 0; white-space: normal; }   /* five names, then three affiliations, per line */
 .authors { font-size: 1.02rem; }
-.authors a.home { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: calc(4px * var(--k)); text-decoration-color: color-mix(in srgb, currentColor 60%, transparent); transition: text-decoration-color .2s; }   /* the first author links to their homepage */
-.authors a.home:hover { text-decoration-color: currentColor; }
+.authors a.home { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: calc(4px * var(--k)); text-decoration-color: color-mix(in srgb, currentColor 16%, transparent); transition: text-decoration-color .2s; }   /* the first author links to their homepage: a barely-there line, clearer on hover */
+.authors a.home:hover { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
 .affils, .notes { color: var(--hero-muted); font-size: .9rem; }
 .notes { margin: calc(4px * var(--k)) 0 0; font-size: .84rem; }
 sup { font-size: .68em; }
