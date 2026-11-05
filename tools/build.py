@@ -89,6 +89,9 @@ def image_size(path):
             i += 1
             continue
         marker = data[i + 1]
+        if marker == 0xFF:   # fill bytes before a marker (T.81 B.1.1.2)
+            i += 1
+            continue
         if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
             i += 2
             continue

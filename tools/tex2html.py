@@ -225,18 +225,17 @@ def render(doc, img_prefix, dims=None):
                 out.append('<ol class="rd-list">%s</ol>' % ''.join('<li>%s</li>' % x for x in b['items']))
             else:
                 tr = b['trace'] or {}
-                turns = ','.join(str(t) for t in tr.get('turns', []))
                 # \rbox coordinates are fractions with the origin at the image's bottom-left corner
                 boxes = ''.join('<i class="rd-box" style="left:%.1f%%;top:%.1f%%;width:%.1f%%;height:%.1f%%"></i>'
                                 % (x0 * 100, (1 - y1) * 100, (x1 - x0) * 100, (y1 - y0) * 100) for x0, y0, x1, y1, _ in b['boxes'])
-                out.append('<figure class="rd-fig" id="img-%d" data-img="%d" data-turns="%s">' % (b['n'], b['n'], turns))
+                out.append('<figure class="rd-fig" id="img-%d" data-img="%d">' % (b['n'], b['n']))
                 out.append('<button type="button" class="rd-imgwrap" aria-label="Open image %d full size"><img src="%s%s" alt="%s"%s decoding="async">%s</button>'
                            % (b['n'], img_prefix, b['file'], html.escape(re.sub('<[^>]+>', '', b['caption'])),
                               ' width="%d" height="%d"' % dims[b['file']] if dims and b['file'] in dims else '', boxes))
                 out.append('<figcaption><span class="rd-fign">Image %d</span> %s</figcaption>' % (b['n'], b['caption']))
                 if tr:
-                    out.append('<div class="rd-trace" data-layer="trace" data-turns="%s"><span class="rd-trace-tag">Trace</span> <span class="rd-trace-label">%s</span>'
-                               '<div class="rd-trace-body"><p>%s</p><p><b>Why it was used.</b> %s</p></div></div>' % (turns, tr['label'], tr['source'], tr['why']))
+                    out.append('<div class="rd-trace" data-layer="trace"><span class="rd-trace-tag">Trace</span> <span class="rd-trace-label">%s</span>'
+                               '<div class="rd-trace-body"><p>%s</p><p><b>Why it was used.</b> %s</p></div></div>' % (tr['label'], tr['source'], tr['why']))
                 out.append('</figure>')
         out.append('</section>')
     out.append('<section class="rd-sec rd-refs"><h4>References</h4>')

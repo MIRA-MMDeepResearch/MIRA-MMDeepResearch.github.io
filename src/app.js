@@ -411,7 +411,7 @@ $$('.hl-list li').forEach(li => {
 });
 
 /* ---------- results chart ---------- */
-const chartWrap = $('#chartWrap'), chartSvg = $('#chart'), chartTip = $('#chartTip');
+const chartWrap = $('#chartWrap'), chartSvg = $('#chart'), chartTip = $('#chartTip'), chartCard = chartWrap.closest('.card');
 const hidden = new Set();
 function drawChart() {
   const C = DATA.chart, W = 1320, H = 380, L = 46, R = 14, T = 26, B = 50;
@@ -473,11 +473,15 @@ $('#legend').addEventListener('click', e => {
   const i = +b.dataset.i; hidden.has(i) ? hidden.delete(i) : hidden.add(i);
   drawChart(); drawLegend();
 });
-function placeTip(tip, wrap, target, html) {
+function placeTip(tip, wrap, target, html) {   // a bubble over the target, kept inside the box it is positioned against; below the target when there is no room above
   const r = target.getBoundingClientRect(), w = wrap.getBoundingClientRect();
   tip.innerHTML = html;
-  tip.style.left = (r.left + r.width / 2 - w.left) + 'px';
-  tip.style.top = (r.top - w.top - tip.offsetHeight - 2) + 'px';
+  const half = tip.offsetWidth / 2, pad = 6, sx = wrap.scrollLeft || 0, sy = wrap.scrollTop || 0, vw = wrap.clientWidth || w.width;
+  const cx = Math.max(half + pad, Math.min(vw - half - pad, r.left + r.width / 2 - w.left)) + sx;
+  let top = r.top - w.top - tip.offsetHeight - 2;
+  if (top < pad) top = r.bottom - w.top + 14;
+  tip.style.left = cx + 'px';
+  tip.style.top = top + sy + 'px';
   tip.classList.add('on');
 }
 chartSvg.addEventListener('mouseover', e => {
@@ -485,7 +489,7 @@ chartSvg.addEventListener('mouseover', e => {
   const se = DATA.chart.series[+bar.dataset.i], bn = DATA.chart.benchmarks[+bar.dataset.g];
   $$('.bar.hot', chartSvg).forEach(b => b.classList.remove('hot'));
   bar.classList.add('hot'); chartWrap.classList.add('hovering'); litCell(cellFor(bar));
-  placeTip(chartTip, chartWrap, bar, `<b>${se.label}</b><br><span class="m">${(+bar.dataset.v).toFixed(2)}</span> on ${bn} · click to see it in the table`);
+  placeTip(chartTip, chartCard, bar, `<b>${se.label}</b><br><span class="m">${(+bar.dataset.v).toFixed(2)}</span> on ${bn} · click to see it in the table`);
 });
 chartSvg.addEventListener('mouseout', e => {
   if (e.target.closest('.bar')) { chartWrap.classList.remove('hovering'); chartTip.classList.remove('on'); $$('.bar.hot', chartSvg).forEach(b => b.classList.remove('hot')); litCell(null); }
@@ -523,7 +527,8 @@ function renderTable() {
   const ref = groups.flatMap(g => g.rows).find(r => r.name === pinned);
   let h = `<table class="results"><colgroup><col class="c-model"><col class="c-params">${'<col>'.repeat(nb)}</colgroup><thead><tr>`;
   h += `<th data-col="0">Model</th><th class="params" data-col="1">Params</th>`;
-  header.slice(2).forEach((b, c) => h += `<th data-col="${c + 2}">${b}<span class="sort">${sortCol === c ? (sortDir < 0 ? '▾' : '▴') : ''}</span></th>`);
+  const shy = n => n.replace('MMDeepResearch', 'MMDeep\u00ADResearch');   // the one long unhyphenated name may break here when the columns are narrow
+  header.slice(2).forEach((b, c) => h += `<th data-col="${c + 2}">${shy(b)}<span class="sort">${sortCol === c ? (sortDir < 0 ? '▾' : '▴') : ''}</span></th>`);
   h += `</tr></thead><tbody>`;
   groups.forEach((g, gi) => {
     h += `<tr class="group"><td colspan="${nb + (narrowTable.matches ? 1 : 2)}">${g.title}</td></tr>`;   // the Params column is hidden below 960px
@@ -651,7 +656,7 @@ function renderHead() {
 
 /* ---------- trace timeline (first request only) ---------- */
 const KINDS = { search: ['Search', '#F3CDD0'], page: ['Open page', '#E59AA2'], image: ['Open image', '#C44C5B'], find: ['Find', '#A8303E'], python: ['Python', '#8B1F2C'], submit: ['Submit report', '#4F0C14'] };
-const traceSvg = $('#trace'), traceScroll = $('#traceScroll'), traceTip = $('#traceTip');
+const traceSvg = $('#trace'), traceScroll = $('#traceScroll'), traceTip = $('#traceTip'), traceCard = traceScroll.closest('.card');   // the tooltip hangs on the card, outside the scrolling timeline
 let maxTurns = 1;
 function drawTrace() {
   const TR = REPLAY.trace;
@@ -731,7 +736,7 @@ traceSvg.addEventListener('mouseover', e => {
     const arg = c.a ? `<br><span class="m">${c.a.replace(/</g, '&lt;')}${c.a.length >= 80 ? '…' : ''}</span>` : '';
     const sub = c.k === 'submit' ? REPLAY.trace[sq.dataset.mode].submissions[sq.dataset.turn] : null;
     const gate = sub ? `<br>${sub.accepted ? 'accepted by the report gate' : 'rejected: ' + sub.reason}` : '';
-    placeTip(traceTip, traceScroll, $('rect', sq), `<b>${KINDS[c.k][0]}</b> · ${sq.dataset.mode} turn ${sq.dataset.turn}${arg}${gate}`);
+    placeTip(traceTip, traceCard, $('rect', sq), `<b>${KINDS[c.k][0]}</b> · ${sq.dataset.mode} turn ${sq.dataset.turn}${arg}${gate}`);
     return;
   }
   const col = e.target.closest('.col-hit');
@@ -840,7 +845,7 @@ document.addEventListener('click', e => { [secMenu, gateMenu].forEach(m => { if 
 function renderReport() {
   const rep = CUR.report[curMode];
   articleBody.innerHTML = rep.html;
-  modeSwitch.innerHTML = MODES.map(m => { const r = CUR.report[m]; return `<button type="button" role="tab" data-mode="${m}" aria-selected="${m === curMode}"><b>${m === 'concise' ? 'Concise' : 'Detail'} report</b><small>${r.images} image${r.images === 1 ? '' : 's'} · ${r.refs} source${r.refs === 1 ? '' : 's'}</small></button>`; }).join('');
+  modeSwitch.innerHTML = MODES.map(m => { const r = CUR.report[m]; return `<button type="button" role="tab" data-mode="${m}" aria-selected="${m === curMode}"><b>${m === 'concise' ? 'Concise' : 'Detail'} report</b><small>${r.images}&nbsp;image${r.images === 1 ? '' : 's'} · ${r.refs}&nbsp;source${r.refs === 1 ? '' : 's'}</small></button>`; }).join('');
   $$('.chips .cnt').forEach(c => c.textContent = $$(c.dataset.cnt, article).length);
   // the gate log moves out of the report into its menu
   const gateSec = $('.rd-gate', article), gateItems = gateSec ? $$('li', gateSec).length : 0;
@@ -946,8 +951,10 @@ addEventListener('resize', () => { if (innerWidth === tourW) return replaceTip()
 
 /* ---------- switching requests ---------- */
 function loadCase(k, mode) { cur = k; CUR = CASES[k]; curMode = mode || 'concise'; renderHead(); renderReport(); }
+let pendingCase = null;
 function switchCase(k, mode) {
-  if (k === cur || turning) return;
+  if (k === cur) { pendingCase = null; return; }
+  if (turning) { pendingCase = [k, mode]; return; }   // a second click during the turn is honoured when the turn ends
   endTour();
   const top = deck.getBoundingClientRect().top;
   if (top < 0) scrollTo({ top: scrollY + top - 76, behavior: 'auto' });   // keep the deck's head in view while the page changes
@@ -956,7 +963,7 @@ function switchCase(k, mode) {
   setTimeout(() => {
     loadCase(k, mode);
     casePage.classList.remove('out'); casePage.classList.add('in'); void casePage.offsetWidth; casePage.classList.remove('in');
-    setTimeout(() => { turning = false; }, 460);
+    setTimeout(() => { turning = false; if (pendingCase) { const [k2, m2] = pendingCase; pendingCase = null; switchCase(k2, m2); } }, 460);
   }, 240);
 }
 loadCase(0);
@@ -1012,4 +1019,18 @@ $('#copyBib').addEventListener('click', async e => {
   catch (err) { const r = document.createRange(); r.selectNodeContents($('#bibText')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; }
   setTimeout(() => b.textContent = 'Copy', 1600);
 });
+
+/* ---------- sideways scrollers (the chart, the tool-call timeline, the table on narrow screens) fade at the edge that still has content ---------- */
+function scrollCue(el) {
+  const upd = () => {
+    const more = el.scrollWidth - el.clientWidth - el.scrollLeft;
+    el.style.setProperty('--fade-r', (more > 2 ? 40 : 0) + 'px');
+    el.style.setProperty('--fade-l', (el.scrollLeft > 2 ? 40 : 0) + 'px');
+  };
+  el.addEventListener('scroll', upd, { passive: true });
+  new ResizeObserver(upd).observe(el);
+  new MutationObserver(upd).observe(el, { childList: true });
+  upd();
+}
+['#chartWrap', '#traceScroll', '#tableHost'].forEach(sel => { const el = $(sel); if (el) scrollCue(el); });
 })();

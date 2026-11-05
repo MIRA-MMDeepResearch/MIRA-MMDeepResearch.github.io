@@ -76,7 +76,7 @@
     </div>
     <div class="card chart-card">
       <div class="chart-top"><div class="legend" id="legend" role="group" aria-label="Models"></div></div>
-      <div class="chart-wrap" id="chartWrap"><svg id="chart" role="img" aria-label="Benchmark scores of six models"></svg><div class="tip" id="chartTip"></div></div>
+      <div class="chart-wrap" id="chartWrap"><svg id="chart" role="img" aria-label="Benchmark scores of six models"></svg></div><div class="tip" id="chartTip"></div>
     </div>
     <div class="card tbl-card" style="margin-top:18px">
       <div class="tbl-tools">
@@ -129,7 +129,7 @@
           <h3 id="replayTitle"></h3>
           <p class="qtext" id="replayQ"></p>
         </div>
-        <div class="runs" id="replayRuns" aria-label="Two runs of the same request"></div>
+        <div class="runs" id="replayRuns" role="group" aria-label="Two runs of the same request"></div>
       </div>
       <div class="trace-top">
         <button type="button" class="play" id="playBtn">&#9654; Replay the run</button>
@@ -137,7 +137,7 @@
         <span class="counter" id="counter"></span>
         <div class="legend" id="traceLegend" role="group" aria-label="Tool kinds"></div>
       </div>
-      <div class="trace-scroll" id="traceScroll"><svg id="trace" role="img" aria-label="Tool calls per assistant turn in Concise and Detail mode"></svg><div class="tip" id="traceTip"></div></div>
+      <div class="trace-scroll" id="traceScroll"><svg id="trace" role="img" aria-label="Tool calls per assistant turn in Concise and Detail mode"></svg></div><div class="tip" id="traceTip"></div>
       <p class="hint">Recorded inside MIRA-Harness: each square is one tool call, one column per assistant turn. Hover a square to see the call. A cross marks a draft the report gate rejected, a tick the accepted one; the tinted band is the revision that followed.</p>
     </div>
     <div class="deck" id="deck">
@@ -150,7 +150,7 @@
           <div class="case-top"><span class="kicker" id="caseKicker"></span><button type="button" class="guide" id="tipsBtn" title="Show what this page can do"><span class="q" aria-hidden="true">?</span>Guide</button></div>
           <h3 class="case-title" id="caseTitle"></h3>
           <p class="qtext" id="caseQ"></p>
-          <div class="runs" id="caseRuns" aria-label="Two runs of the same request"></div>
+          <div class="runs" id="caseRuns" role="group" aria-label="Two runs of the same request"></div>
         </header>
         <div class="toolbar">
           <div class="row">
@@ -159,7 +159,7 @@
             <details class="menu" id="secMenu"><summary>Sections</summary><div class="pop"><ul class="toc" id="toc"></ul></div></details>
             <details class="menu" id="gateMenu"><summary id="gateSum">Report gate</summary><div class="pop"><ul class="gate-log" id="gateLog"></ul></div></details>
           </div>
-          <div class="chips" aria-label="Annotation layers">
+          <div class="chips" role="group" aria-label="Annotation layers">
             <label class="on"><input type="checkbox" id="layer-clue" checked><span class="sw" style="background:var(--hl)"></span>Request terms<span class="cnt" data-cnt="mark.clue"></span></label>
             <label class="on"><input type="checkbox" id="layer-fact" checked><span class="sw" style="background:var(--rose);border-bottom:2px wavy var(--wine)"></span>Checked facts &amp; image boxes<span class="cnt" data-cnt="mark.fact"></span></label>
             <label class="on"><input type="checkbox" id="layer-note" checked><span class="sw" style="background:var(--tint);border-left:3px solid var(--wine)"></span>Paper notes<span class="cnt" data-cnt=".rd-note"></span></label>
@@ -169,7 +169,7 @@
         <div class="coach" id="coach" hidden><div class="halo"></div><div class="say" role="dialog" aria-label="Guide"><button type="button" class="x" aria-label="Close the guide">&times;</button><b></b><span></span><div class="nav"><small></small><button type="button" class="back" aria-label="Previous tip">&larr;</button><button type="button" class="next"></button></div></div></div>
         <div class="book" id="book">
           <div class="leaves">
-            <div class="view" id="bookView" tabindex="0" aria-label="Report pages: use the arrow keys to turn them">
+            <div class="view" id="bookView" tabindex="0" role="region" aria-label="Report pages: use the arrow keys to turn them">
               <article class="article show-clue show-fact show-note show-trace" id="article"><div id="articleBody"></div></article>
             </div>
           </div>
